@@ -15,7 +15,6 @@ class Lobby:
         if len(self.players) < 6:
             self.players.append(user)
         else:
-            # TODO: Find a better exception class
             raise Exception('Lobby is full')
 
     def leave(self, user: User) -> None:

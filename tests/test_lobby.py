@@ -1,5 +1,5 @@
 import unittest
-from lobby import Lobby
+from lobby.lobby import Lobby
 from users.user import User
 
 
@@ -67,5 +67,12 @@ class TestLobby(unittest.TestCase):
         self.assertEqual(self.lobby.current_players(), 2, 
             "A user left the room but the player counter isn't updated")
 
-    # def test_host_leaves_lobby(self):
-    # TODO: Delete the room when the host leaves it
+    def test_host_leaves_lobby(self):
+        self.lobby.join(User("user1"))
+        self.lobby.join(User("user2"))
+        self.lobby.join(User("user3"))
+
+        self.lobby.leave(self.lobby.host)
+
+        self.assertEqual(self.lobby.current_players(), 0, 
+            "The host user left the room, but the other players are still in the room")

@@ -10,3 +10,8 @@ def get_lobbies():
     lobbies = lobbyservice.get_lobbies()
     return JSONResponse(content={'lobbies': [lobby.to_dict() for lobby in lobbies]},
                         status_code=200)
+
+@router.post('/create-lobby')
+def create_lobby(name: str, host:str):
+    lobbyservice.create_new_lobby(name, host)
+    return ("Lobby created")

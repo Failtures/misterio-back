@@ -28,3 +28,6 @@ class Lobby:
 
     def can_start(self, user: User) -> bool:
         return user == self.host and 2 < len(self.players) < 6
+
+    def to_dict(self):
+        return {'name': self.name, 'host': self.host.nickname}

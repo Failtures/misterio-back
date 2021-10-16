@@ -1,3 +1,4 @@
+from typing import List
 from users.user import User
 from .lobby import Lobby
 
@@ -14,5 +15,5 @@ class LobbyService:
 
         self.lobbies.append(Lobby(lobby_name, host))
 
-    def get_lobbies(self) -> [Lobby]:
+    def get_lobbies(self) -> List[Lobby]:
         return self.lobbies

@@ -11,6 +11,9 @@ class Lobby:
         self.host = host
         self.players = [host]
 
+    def __eq__(self, other):
+        return self.name == other.name
+
     def join(self, user: User) -> None:
         if len(self.players) < 6:
             self.players.append(user)

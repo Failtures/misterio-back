@@ -15,3 +15,8 @@ def get_lobbies():
 def create_lobby(name: str, host:str):
     lobbyservice.create_new_lobby(name, host)
     return ("Lobby created")
+
+@router.put('/add-player')
+def add_player(name:str, player:str):
+    lobbyservice.add_player(name, player)
+    return ("Player added")

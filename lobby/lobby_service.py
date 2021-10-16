@@ -19,3 +19,15 @@ class LobbyService:
 
     def get_lobbies(self) -> List[Lobby]:
         return self.lobbies
+
+    def get_lobby_by_name(self, name: str) -> Lobby:
+        for lobby in self.lobbies:
+            if lobby.name == name:
+                return lobby
+
+    def add_player(self, lobby_name: str, player_name: str):
+        new_player = User(player_name)
+
+        lobby = self.get_lobby_by_name(lobby_name)
+        lobby.join(new_player)
+

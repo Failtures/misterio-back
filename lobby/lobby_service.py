@@ -25,9 +25,8 @@ class LobbyService:
             if lobby.name == name:
                 return lobby
 
-    def add_player(self, lobby_name: str, player_name: str):
+    def join_player(self, lobby_name: str, player_name: str) -> None:
         new_player = User(player_name)
 
         lobby = self.get_lobby_by_name(lobby_name)
         lobby.join(new_player)
-

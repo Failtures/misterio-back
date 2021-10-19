@@ -15,8 +15,15 @@ class TestLobbyService(unittest.TestCase):
                         [Lobby("test-lobby", User("test-host"))],
                         "The lobby was not created")
 
-    def test_create_lobby_without_name(self):
+    def test_create_lobby_with_empty_name(self):
         self.lobby_service.create_new_lobby("", "test-host")
+
+        self.assertEqual(self.lobby_service.lobbies,
+                        [Lobby("test-host's lobby", User("test-host"))],
+                        "The lobby was not created")
+
+    def test_create_lobby_with_None_name(self):
+        self.lobby_service.create_new_lobby(None, "test-host")
 
         self.assertEqual(self.lobby_service.lobbies,
                         [Lobby("test-host's lobby", User("test-host"))],
@@ -33,3 +40,7 @@ class TestLobbyService(unittest.TestCase):
                                     Lobby("test-lobby-2", User("test-host-2")),
                                     Lobby("test-lobby-3", User("test-host-3"))],
                                     "The list of lobbies does not match the lobbies created")
+
+    def test_create_lobby_without_host(self):
+        self.lobby_service.create_new_lobby("test-lobby", None)
+        # TODO complete this test

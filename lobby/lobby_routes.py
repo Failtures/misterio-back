@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from extensions import lobbyservice
+from users.user import User
 
 router = APIRouter()
 
@@ -13,8 +14,10 @@ def get_lobbies():
 
 @router.post('/create-lobby')
 def create_lobby(name: str, host:str):
-    lobbyservice.create_new_lobby(name, host)
-    return JSONResponse(content={'lobby': [lobbyservice.get_lobby_by_name(name).to_dict()],
+    #When you create your lobby, you have to provide your user name 
+    host_user = User(host)
+    lobbyservice.create_new_lobby(name, host_user)
+    return JSONResponse(content={'lobby': lobbyservice.get_lobby_by_name(name).to_dict(),
                                 'info': "Lobby was created"},
                                 status_code=200)
 
@@ -22,10 +25,10 @@ def create_lobby(name: str, host:str):
 def join_player(name:str, player:str):
     try:
         lobbyservice.join_player(name, player)
-        return JSONResponse(content={'lobby': [lobbyservice.get_lobby_by_name(name).to_dict()],
+        return JSONResponse(content={'lobby': lobbyservice.get_lobby_by_name(name).to_dict(),
                                     'info': "Player added"},
                             status_code=200)
     except Exception:
-        return JSONResponse(content={'lobby': [lobbyservice.get_lobby_by_name(name).to_dict()],
+        return JSONResponse(content={'lobby': lobbyservice.get_lobby_by_name(name).to_dict(),
                                     'info': "The lobby is full or the player is already in the lobby"},
                             status_code=502)

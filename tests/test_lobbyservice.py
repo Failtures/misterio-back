@@ -3,36 +3,37 @@ from lobby.lobby_service import LobbyService
 from lobby.lobby import Lobby
 from users.user import User
 
+
 class TestLobbyService(unittest.TestCase):
 
     def setUp(self) -> None:
         self.lobby_service = LobbyService()
 
     def test_create_lobby(self):
-        self.lobby_service.create_new_lobby("test-lobby", "test-host")
+        self.lobby_service.create_new_lobby("test-lobby", User("test-host"))
 
         self.assertEqual(self.lobby_service.lobbies,
                         [Lobby("test-lobby", User("test-host"))],
                         "The lobby was not created")
 
     def test_create_lobby_with_empty_name(self):
-        self.lobby_service.create_new_lobby("", "test-host")
+        self.lobby_service.create_new_lobby("", User("test-host"))
 
         self.assertEqual(self.lobby_service.lobbies,
                         [Lobby("test-host's lobby", User("test-host"))],
                         "The lobby was not created")
 
     def test_create_lobby_with_None_name(self):
-        self.lobby_service.create_new_lobby(None, "test-host")
+        self.lobby_service.create_new_lobby(None, User("test-host"))
 
         self.assertEqual(self.lobby_service.lobbies,
                         [Lobby("test-host's lobby", User("test-host"))],
                         "The lobby was not created")
 
     def test_get_lobbies(self):
-        self.lobby_service.create_new_lobby("test-lobby-1", "test-host-1")
-        self.lobby_service.create_new_lobby("test-lobby-2", "test-host-2")
-        self.lobby_service.create_new_lobby("test-lobby-3", "test-host-3")
+        self.lobby_service.create_new_lobby("test-lobby-1", User("test-host-1"))
+        self.lobby_service.create_new_lobby("test-lobby-2", User("test-host-2"))
+        self.lobby_service.create_new_lobby("test-lobby-3", User("test-host-3"))
 
         lobbies = self.lobby_service.get_lobbies()
 
@@ -42,5 +43,8 @@ class TestLobbyService(unittest.TestCase):
                                     "The list of lobbies does not match the lobbies created")
 
     def test_create_lobby_without_host(self):
-        self.lobby_service.create_new_lobby("test-lobby", None)
-        # TODO complete this test
+        try:
+            self.lobby_service.create_new_lobby("test-lobby", None)
+            self.assertTrue(False, 'Passing None as host should raise an exception')
+        except Exception:
+            self.assertTrue(True)

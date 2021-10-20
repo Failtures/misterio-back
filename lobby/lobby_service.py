@@ -9,6 +9,9 @@ class LobbyService:
         self.lobbies = []
 
     def create_new_lobby(self, lobby_name: str, host: User) -> None:
+        if not isinstance(host, User):
+            raise Exception('Host should be of type User')
+
         # Defaults to player's nickname if no lobby name is provided
         if lobby_name is None or lobby_name == '':
             lobby_name = f"{host.nickname}'s lobby"
@@ -20,9 +23,7 @@ class LobbyService:
         return self.lobbies
 
     def get_lobby_by_name(self, name: str) -> Lobby:
-        for lobby in self.lobbies:
-            if lobby.name == name:
-                return lobby
+        return next(lobby for lobby in self.lobbies if lobby.name == name)
 
     def join_player(self, lobby_name: str, player_name: str) -> None:
         new_player = User(player_name)

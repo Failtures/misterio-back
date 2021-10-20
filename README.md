@@ -4,3 +4,9 @@
 
 # Run
 - ```python -m uvicorn main:app```
+
+# Tests
+- ```python -m unittest discover tests/```
+
+# Notes for developers
+- All tests using the FastAPI test client should extend the TestCaseFastAPI class

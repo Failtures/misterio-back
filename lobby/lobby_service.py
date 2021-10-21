@@ -17,7 +17,6 @@ class LobbyService:
             lobby_name = f"{host.nickname}'s lobby"
 
         self.lobbies.append(Lobby(lobby_name, host))
-        # TODO add exception if a user is not passed
 
     def get_lobbies(self) -> List[Lobby]:
         return self.lobbies
@@ -25,8 +24,9 @@ class LobbyService:
     def get_lobby_by_name(self, name: str) -> Lobby:
         return next(lobby for lobby in self.lobbies if lobby.name == name)
 
-    def join_player(self, lobby_name: str, player_name: str) -> None:
-        new_player = User(player_name)
-
+    def join_player(self, lobby_name: str, player: User) -> None:
+        if not isinstance(player, User):
+            raise Exception('Player should be of type User')
+        
         lobby = self.get_lobby_by_name(lobby_name)
-        lobby.join(new_player)
+        lobby.join(player)

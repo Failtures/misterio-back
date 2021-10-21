@@ -14,7 +14,7 @@ async def get_lobbies():
 
 
 @router.post('/create-lobby')
-def create_lobby(name: str, host:str):
+async def create_lobby(name: str, host:str):
     # When you create your lobby, you have to provide your user name
     host_user = User(host)
     lobbyservice.create_new_lobby(name, host_user)
@@ -24,13 +24,15 @@ def create_lobby(name: str, host:str):
 
 
 @router.put('/join-player')
-def join_player(name:str, player:str):
+async def join_player(name:str, player:str):
+    # When you enter in a lobby, you have to provide your user name
+    new_player = User(player)
     try:
-        lobbyservice.join_player(name, player)
+        lobbyservice.join_player(name, new_player)
         return JSONResponse(content={'lobby': lobbyservice.get_lobby_by_name(name).to_dict(),
                                      'info': "Player added"},
                             status_code=200)
-    except Exception:
-        return JSONResponse(content={'lobby': lobbyservice.get_lobby_by_name(name).to_dict(),
+    except:
+        return JSONResponse(content={'lobby': None,
                                      'info': "The lobby is full or the player is already in the lobby"},
                             status_code=502)

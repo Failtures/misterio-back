@@ -13,10 +13,10 @@ class TestLobbyEndpoints(TestCaseFastAPI):
             self.client.post(f"/create-lobby?name=lobby{i}&host=host{i}")
 
     def test_create_lobby(self):
-        response = self.client.post("/create-lobby?name=lobby&host=host")
+        res = self.client.post("/create-lobby?name=lobby&host=host")
 
-        self.assertEqual(response.status_code, 200, "The status code isn't correct (200)")
-        self.assertEqual(response.json(), {'lobby': {
+        self.assertEqual(res.status_code, 200, "The status code isn't correct (200)")
+        self.assertEqual(res.json(), {'lobby': {
             'name': 'lobby', 'host': 'host',
             'current_players': 1,
             'max_players': 6},
@@ -30,3 +30,16 @@ class TestLobbyEndpoints(TestCaseFastAPI):
         self.assertEqual(res.status_code, 200)
         # Has to be six since previous test added one
         self.assertEqual(len(lobbies), 6)
+
+    def test_join_when_full(self):
+        # First, five players join the lobby0
+        for i in range(5):
+            self.client.put(f"/join-player?name=lobby0&player=player{i}")
+        # Then an extra player joins the lobby
+        res = self.client.put("/join-player?name=lobby0&player=player5")
+
+        lobby = res.json()['lobby']
+
+        self.assertEqual(res.status_code, 502, "The status code isn't correct (502)")
+        self.assertEqual(lobby, None)
+

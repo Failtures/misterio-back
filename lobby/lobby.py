@@ -33,7 +33,7 @@ class Lobby:
         return len(self.players)
 
     def can_start(self, user: User) -> bool:
-        return user == self.host and 2 < self.current_players() < 6
+        return user == self.host and 2 <= self.current_players() <= 6
 
     def to_dict(self):
         return {'name': self.name, 'host': self.host.nickname,

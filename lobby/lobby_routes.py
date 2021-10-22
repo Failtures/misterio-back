@@ -41,9 +41,14 @@ async def join_player(name:str, player:str):
 @router.post('/start-match')
 async def start_match(lobby: str, player: str):
     this_lobby = lobbyservice.get_lobby_by_name(lobby)
+    start_player = lobbyservice.get_player_in_lobby(this_lobby, player)
 
-    if this_lobby.host.nickname == player and len(this_lobby.players) >= 2:
+    if this_lobby.can_start(start_player):
         match = matchservice.create_new_match(this_lobby.name, this_lobby.players)
         return JSONResponse(content={'match': match.to_dict(),
                                      'info': "Match was created"},
                             status_code=200)
+    else:
+        return JSONResponse(content={'match': None,
+                                     'info': "Match wasn't created"},
+                            status_code=502)

@@ -14,6 +14,9 @@ class Match:
         # Shuffle turn order
         random.shuffle(self.players)
 
+    def __eq__ (self, other):
+        return self.name == other.name
+
     def next_turn(self) -> User:
         self._currentturn += 1
         self._currentturn %= len(self.players)

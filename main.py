@@ -1,6 +1,7 @@
 import sys
 
 from lobby.lobby_routes import router as lobbyrouter
+from matches.match_routes import router as matchrouter
 from fastapi import FastAPI
 
 # Activates terminal colors for windows users
@@ -9,3 +10,4 @@ if sys.platform == 'win32':
 
 app = FastAPI()
 app.include_router(lobbyrouter)
+app.include_router(matchrouter)

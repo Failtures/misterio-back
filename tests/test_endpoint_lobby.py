@@ -34,7 +34,7 @@ class TestLobbyEndpoints(TestCaseFastAPI):
     def test_join_when_full(self):
         # First, five players join the lobby0
         for i in range(5):
-            self.client.put(f"/join-player?name=lobby0&player=player{i}")
+            self.client.put(f"/join-player?name=lobby0&player=player{i}")   
         # Then an extra player joins the lobby
         res = self.client.put("/join-player?name=lobby0&player=player5")
 
@@ -43,8 +43,22 @@ class TestLobbyEndpoints(TestCaseFastAPI):
         self.assertEqual(res.status_code, 502, "The status code isn't correct (502)")
         self.assertEqual(lobby, None)
 
+    def test_start_match_one_player(self):
+        self.client.post("/create-lobby?name=lobby-one-player&host=host")
+        res = self.client.post('/start-match?lobby=lobby-one-player&player=host')
+
+        self.assertEqual(res.status_code, 502, "The status code isn't correct (502)")
+
+    def test_start_match_by_no_host(self):
+        self.client.post("/create-lobby?name=lobby-no-host&host=host")
+        self.client.put("/join-player?name=lobby-no-host&player=player")
+        res = self.client.post('/start-match?lobby=lobby-no-host&player=player')
+
+        self.assertEqual(res.status_code, 502, "The status code isn't correct (502)")
+
     def test_start_match_two_players(self):
-        self.client.put("/join-player?name=lobby&player=player")
-        res = self.client.post("/start-match?lobby=lobby&player=host")
+        self.client.post("/create-lobby?name=lobby-two-players&host=host")
+        self.client.put("/join-player?name=lobby-two-players&player=player")
+        res = self.client.post("/start-match?lobby=lobby-two-players&player=host")
 
         self.assertEqual(res.status_code, 200)

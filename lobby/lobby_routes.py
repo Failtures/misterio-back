@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from extensions import lobbyservice
+from extensions import matchservice
 from users.user import User
 
 router = APIRouter()
@@ -36,3 +37,13 @@ async def join_player(name:str, player:str):
         return JSONResponse(content={'lobby': None,
                                      'info': "The lobby is full or the player is already in the lobby"},
                             status_code=502)
+
+@router.post('/start-match')
+async def start_match(lobby: str, player: str):
+    this_lobby = lobbyservice.get_lobby_by_name(lobby)
+
+    if this_lobby.host.nickname == player and len(this_lobby.players) >= 2:
+        match = matchservice.create_new_match(this_lobby.name, this_lobby.players)
+        return JSONResponse(content={'match': match.to_dict(),
+                                     'info': "Match was created"},
+                            status_code=200)

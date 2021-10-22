@@ -43,3 +43,8 @@ class TestLobbyEndpoints(TestCaseFastAPI):
         self.assertEqual(res.status_code, 502, "The status code isn't correct (502)")
         self.assertEqual(lobby, None)
 
+    def test_start_match_two_players(self):
+        self.client.put("/join-player?name=lobby&player=player")
+        res = self.client.post("/start-match?lobby=lobby&player=host")
+
+        self.assertEqual(res.status_code, 200)

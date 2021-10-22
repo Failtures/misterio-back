@@ -28,3 +28,12 @@ class Match:
 
     def current_turn(self) -> User:
         return self.players[self._currentturn]
+
+    def players_to_list(self):
+        player_list = []
+        for player in self.players:
+            player_list.append(player.nickname)
+        return player_list
+
+    def to_dict(self):
+        return {'name': self.name, 'players': self.players_to_list(), 'turn': self._currentturn}

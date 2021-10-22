@@ -8,8 +8,11 @@ class MatchService:
     def __init__(self):
         self.matches = []
 
-    def create_new_match(self, name: str, players: list[User] ) -> None:
+    def create_new_match(self, name: str, players: List[User] ) -> Match:
+        match = Match(name, players)
         self.matches.append(Match(name, players))
+
+        return match
 
     def get_matches(self) -> List[Match]:
         return self.matches
@@ -18,7 +21,3 @@ class MatchService:
         for match in self.matches:
             if match.name == name:
                 return match
-
-
-
-    

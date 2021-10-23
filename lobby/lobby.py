@@ -15,10 +15,11 @@ class Lobby:
         return self.name == other.name
 
     def join(self, user: User) -> None:
+        for player in self.players:
+            if player.nickname == user.nickname:
+                raise Exception('Player is already in the lobby')
         if len(self.players) < 6:
             self.players.append(user)
-        elif user in self.players:
-            raise Exception('Player is already in the lobby')
         else:
             raise Exception('Lobby is full')
 

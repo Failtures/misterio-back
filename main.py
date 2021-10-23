@@ -1,10 +1,10 @@
 import sys
-import threading
 
 from lobby.lobby_routes import router as lobbyrouter
 from matches.match_routes import router as matchrouter
 from fastapi import FastAPI
-from server import start_server
+from lobby.lobby_ws import main
+
 
 # Activates terminal colors for windows users
 if sys.platform == 'win32':
@@ -13,6 +13,3 @@ if sys.platform == 'win32':
 app = FastAPI()
 app.include_router(lobbyrouter)
 app.include_router(matchrouter)
-
-server_thread = threading.Thread(target=start_server)
-server_thread.start()

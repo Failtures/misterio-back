@@ -16,6 +16,10 @@ class LobbyService:
         if lobby_name is None or lobby_name == '':
             lobby_name = f"{host.nickname}'s lobby"
 
+        for lobby in self.lobbies:
+            if lobby.name == lobby_name:
+                raise Exception('Duplicate lobby name')
+
         self.lobbies.append(Lobby(lobby_name, host))
 
     def get_lobbies(self) -> List[Lobby]:

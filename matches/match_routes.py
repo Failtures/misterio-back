@@ -4,12 +4,14 @@ from extensions import matchservice
 
 router = APIRouter()
 
+
 @router.put('/end-turn')
 async def end_turn(name: str):
     match = matchservice.get_match_by_name(name)
     match.next_turn()
     return JSONResponse(content={'current_turn': match._currentturn},
                         status_code=200)
+
 
 @router.get('/roll-dice')
 async def roll_dice(name: str):

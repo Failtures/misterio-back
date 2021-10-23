@@ -17,7 +17,7 @@ class MatchService:
     def get_matches(self) -> List[Match]:
         return self.matches
 
-    def get_match_by_name(self, name):
+    def get_match_by_name(self, name) -> Match:
         for match in self.matches:
             if match.name == name:
                 return match

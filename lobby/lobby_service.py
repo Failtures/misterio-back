@@ -8,7 +8,7 @@ class LobbyService:
     def __init__(self):
         self.lobbies = []
 
-    def create_new_lobby(self, lobby_name: str, host: User) -> None:
+    def create_new_lobby(self, lobby_name: str, host: User) -> Lobby:
         if not isinstance(host, User):
             raise Exception('Host should be of type User')
 
@@ -20,7 +20,9 @@ class LobbyService:
             if lobby.name == lobby_name:
                 raise Exception('Duplicate lobby name')
 
-        self.lobbies.append(Lobby(lobby_name, host))
+        lobby = Lobby(lobby_name, host)
+        self.lobbies.append(lobby)
+        return lobby
 
     def get_lobbies(self) -> List[Lobby]:
         return self.lobbies

@@ -37,9 +37,6 @@ class Lobby:
         return user == self.host and 2 <= self.current_players() <= 6
 
     def to_dict(self):
-        player_list = []
-        for player in self.players:
-            player_list.append(player.nickname)
         return {'name': self.name, 'host': self.host.nickname,
                 'current_players': self.current_players(),
-                'players': player_list}
+                'players': [p.nickname for p in self.players]}

@@ -9,12 +9,22 @@ from users.network_user import NetworkUser
 async def main():
     # Runs on all ips available on the network
     async with websockets.serve(endpoints, "0.0.0.0", 8080):
-        await asyncio.Future()  # Run forever        
+        await asyncio.Future()  # Run forever
 
 
 async def endpoints(websocket: websockets.WebSocketServerProtocol, path):
-    while True: # Keeps socket alive
-        data = await websocket.recv()
+    print(f'New connection from {websocket.remote_address}')
+    # Keeps socket alive
+    while True:
+        try:
+            data = await websocket.recv()
+        except websockets.exceptions.ConnectionClosedOK as e:
+            # Recovers from closing sockets
+            print(f'{websocket.remote_address} Closing ws connection: {e}')
+            break
+        except Exception as e:
+            print(f'{websocket.remote_address} Socket crashed, reason: {e}')
+            break
         parsedjson = json.loads(data)
 
         if parsedjson['action'] == 'create_lobby':
@@ -46,30 +56,34 @@ async def join_lobby(parsedjson, websocket: websockets.WebSocketServerProtocol, 
 
     try:
         lobby = lobbyservice.get_lobby_by_name(lobbyname)
-        lobbyservice.join_player(lobby, user)
 
-        for user in lobby.players:
-            await user.socket.send(json.dumps({'action': 'new_player', 'nickname': player, 'lobby': lobby.to_dict()}))
+        for lobbyplayer in lobby.players:
+            await lobbyplayer.socket.send(json.dumps({'action': 'new_player', 'nickname': player}))
+
+        lobbyservice.join_player(lobbyname, user)
+        await user.socket.send(json.dumps({'action': 'joined_lobby', 'lobby': lobby.to_dict()}))
     except Exception as e:
-        await websocket.send(json.dumps({'action': 'failed', 'info': e}))
+        await websocket.send(json.dumps({'action': 'failed', 'info': str(e)}))
 
 
 async def start_match(parsedjson, websocket: websockets.WebSocketServerProtocol, path):
     player = parsedjson['player_name']
     lobbyname = parsedjson['lobby_name']
+
     try:
         lobby = lobbyservice.get_lobby_by_name(lobbyname)
         start_player = lobbyservice.get_player_in_lobby(lobby, player)
-    except Exception as e:
-        await websocket.send("{'error': " + str(e) + "}")
 
-    if lobby.can_start(start_player):
-        match = matchservice.create_new_match(lobby.name, lobby.players)
+        if lobby.can_start(start_player):
+            match = matchservice.create_new_match(lobby.name, lobby.players)
+            json_msg = json.dumps({'action': 'match_started', 'match': match.to_dict()})
+        else:
+            json_msg = json.dumps({'action': 'match_not_started'})
+
         for user in lobby.players:
-            await user.socket.send(json.dumps({'action': 'match_started', 'match': match.to_dict()}))
-    else:
-        for user in lobby.players:
-            await user.socket.send(json.dumps({'action': 'match_not_started'}))
+            await user.socket.send(json_msg)
+    except Exception as e:
+        await websocket.send(json.dumps({'action': 'failed', 'info': str(e)}))
 
 
 # Must be done this way to not conflict with main thread

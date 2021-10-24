@@ -14,16 +14,11 @@ async def get_lobbies():
                         status_code=200)
 
 
-# @router.post('/create-lobby')
-# async def create_lobby(name: str, host: str):
-#     # When you create your lobby, you have to provide your user name
-#     host_user = User(host)
-#     lobbyservice.create_new_lobby(name, host_user)
-#     return JSONResponse(content={'lobby': lobbyservice.get_lobby_by_name(name).to_dict(),
-#                                  'info': "Lobby was created"},
-#                         status_code=200)
-
-
+@router.post('/create-lobby')
+async def create_lobby(name: str, host: str):
+    return JSONResponse(content={'info': 'Deprecated, use websockets instead'}, status_code=404)
+#
+#
 # @router.put('/join-player')
 # async def join_player(name: str, player: str):
 #     # When you enter in a lobby, you have to provide your user name
@@ -37,13 +32,13 @@ async def get_lobbies():
 #         return JSONResponse(content={'lobby': None,
 #                                      'info': "The lobby is full or the player is already in the lobby"},
 #                             status_code=502)
-
-
+#
+#
 # @router.post('/start-match')
 # async def start_match(lobby: str, player: str):
 #     this_lobby = lobbyservice.get_lobby_by_name(lobby)
 #     start_player = lobbyservice.get_player_in_lobby(this_lobby, player)
-
+#
 #     if this_lobby.can_start(start_player):
 #         match = matchservice.create_new_match(this_lobby.name, this_lobby.players)
 #         return JSONResponse(content={'match': match.to_dict(),

@@ -3,7 +3,7 @@ import json
 import websockets
 
 from extensions import matchservice
-from matches.match import Match
+
 
 async def main():
     # Runs on all ips available on the network

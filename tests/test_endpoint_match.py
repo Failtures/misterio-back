@@ -7,7 +7,7 @@ class TestMatchEndpoints(TestCaseFastAPI):
 
     def setUp(self) -> None:
         self.client = TestClient(app)
-			
+
     def test_pass_turn(self):
         # Create a lobby with 3 players and start the match
         self.client.post("/create-lobby?name=lobby12&host=host")

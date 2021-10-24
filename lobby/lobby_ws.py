@@ -1,4 +1,3 @@
-import asyncio
 import json
 import websockets
 
@@ -6,34 +5,14 @@ from extensions import lobbyservice, matchservice
 from users.network_user import NetworkUser
 
 
-async def main():
-    # Runs on all ips available on the network
-    async with websockets.serve(endpoints, "0.0.0.0", 8080):
-        await asyncio.Future()  # Run forever
-
-
-async def endpoints(websocket: websockets.WebSocketServerProtocol, path):
-    print(f'New connection from {websocket.remote_address}')
-    # Keeps socket alive
-    while True:
-        try:
-            data = await websocket.recv()
-        except websockets.exceptions.ConnectionClosedOK as e:
-            # Recovers from closing sockets
-            print(f'{websocket.remote_address} Closing ws connection: {e}')
-            break
-        except Exception as e:
-            print(f'{websocket.remote_address} Socket crashed, reason: {e}')
-            break
-        parsedjson = json.loads(data)
-
-        if parsedjson['action'] == 'create_lobby':
-            await create_lobby(parsedjson, websocket, path)
-        elif parsedjson['action'] == 'join_lobby':
-            await join_lobby(parsedjson, websocket, path)
-        elif parsedjson['action'] == 'start_match':
-            await start_match(parsedjson, websocket, path)
-            
+async def lobby_endpoints(parsedjson, websocket: websockets.WebSocketServerProtocol, path):
+    if parsedjson['action'] == 'lobby_create':
+        await create_lobby(parsedjson, websocket, path)
+    elif parsedjson['action'] == 'lobby_join':
+        await join_lobby(parsedjson, websocket, path)
+    elif parsedjson['action'] == 'lobby_start_match':
+        await start_match(parsedjson, websocket, path)
+       
 
 async def create_lobby(parsedjson, websocket: websockets.WebSocketServerProtocol, path):
     host = parsedjson['host_name']
@@ -84,7 +63,3 @@ async def start_match(parsedjson, websocket: websockets.WebSocketServerProtocol,
             await user.socket.send(json_msg)
     except Exception as e:
         await websocket.send(json.dumps({'action': 'failed', 'info': str(e)}))
-
-
-# Must be done this way to not conflict with main thread
-asyncio.get_event_loop().create_task(main())

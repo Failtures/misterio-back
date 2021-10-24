@@ -1,25 +1,13 @@
-import asyncio
 import json
 import websockets
 
 from extensions import matchservice
 
-
-async def main():
-    # Runs on all ips available on the network
-    async with websockets.serve(endpoints, "0.0.0.0", 8081):
-        await asyncio.Future()  # Run forever   
-
-
-async def endpoints(websocket: websockets.WebSocketServerProtocol, path):
-    while True: # Keeps socket alive
-        data = await websocket.recv()
-        parsedjson = json.loads(data)
-
-        if parsedjson['action'] == 'end_turn':
-            await end_turn(parsedjson, websocket, path)
-        elif parsedjson['action'] == 'roll_dice':
-            await roll_dice(parsedjson, websocket, path)
+async def match_endpoints(parsedjson, websocket: websockets.WebSocketServerProtocol, path):
+    if parsedjson['action'] == 'match_end_turn':
+        await end_turn(parsedjson, websocket, path)
+    elif parsedjson['action'] == 'match_roll_dice':
+        await roll_dice(parsedjson, websocket, path)
 
 
 async def end_turn(parsedjson, websocket: websockets.WebSocketServerProtocol, path):
@@ -37,7 +25,3 @@ async def roll_dice(parsedjson, websocket: websockets.WebSocketServerProtocol, p
 
     for player in match.players:
         await player.socket.send(json.dumps({'action': 'roll_dice', 'dice': match.roll_dice()}))
-
-
-# Must be done this way to not conflict with main thread
-asyncio.get_event_loop().create_task(main())

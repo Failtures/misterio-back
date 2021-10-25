@@ -36,11 +36,14 @@ async def join_lobby(parsedjson, websocket: websockets.WebSocketServerProtocol, 
     try:
         lobby = lobbyservice.get_lobby_by_name(lobbyname)
 
-        for lobbyplayer in lobby.players:
-            await lobbyplayer.socket.send(json.dumps({'action': 'new_player', 'nickname': player}))
-
         lobbyservice.join_player(lobbyname, user)
-        await user.socket.send(json.dumps({'action': 'joined_lobby', 'lobby': lobby.to_dict()}))
+
+        for lobbyplayer in lobby.players:
+            if lobbyplayer == user:
+                await user.socket.send(json.dumps({'action': 'joined_lobby', 'lobby': lobby.to_dict()}))
+            else:
+                await lobbyplayer.socket.send(json.dumps({'action': 'new_player', 'nickname': player}))
+
     except Exception as e:
         await websocket.send(json.dumps({'action': 'failed', 'info': str(e)}))
 

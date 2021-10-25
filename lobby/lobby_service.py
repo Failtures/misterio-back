@@ -35,6 +35,10 @@ class LobbyService:
             raise Exception('Player should be of type User')
         
         lobby = self.get_lobby_by_name(lobby_name)
+
+        if player in lobby.players:
+            raise Exception('Duplicate player name')
+
         lobby.join(player)
 
     def get_player_in_lobby(self, lobby: Lobby, player: str):

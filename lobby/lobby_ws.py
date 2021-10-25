@@ -15,7 +15,7 @@ async def lobby_endpoints(parsedjson, websocket: websockets.WebSocketServerProto
        
 
 async def create_lobby(parsedjson, websocket: websockets.WebSocketServerProtocol, path):
-    host = parsedjson['host_name']
+    host = parsedjson['player_name']
     lobbyname = parsedjson['lobby_name']
 
     user = NetworkUser(host, websocket)
@@ -42,7 +42,7 @@ async def join_lobby(parsedjson, websocket: websockets.WebSocketServerProtocol, 
             if lobbyplayer == user:
                 await user.socket.send(json.dumps({'action': 'joined_lobby', 'lobby': lobby.to_dict()}))
             else:
-                await lobbyplayer.socket.send(json.dumps({'action': 'new_player', 'nickname': player}))
+                await lobbyplayer.socket.send(json.dumps({'action': 'new_player', 'player_name': player}))
 
     except Exception as e:
         await websocket.send(json.dumps({'action': 'failed', 'info': str(e)}))
@@ -60,7 +60,8 @@ async def start_match(parsedjson, websocket: websockets.WebSocketServerProtocol,
             match = matchservice.create_new_match(lobby.name, lobby.players)
             json_msg = json.dumps({'action': 'match_started', 'match': match.to_dict()})
         else:
-            json_msg = json.dumps({'action': 'match_not_started'})
+            json_msg = json.dumps({'action': 'failed', 'info': "Match couldn't start, c"
+                                                               "heck if there are enough players in the lobby"})
 
         for user in lobby.players:
             await user.socket.send(json_msg)

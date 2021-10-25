@@ -3,12 +3,13 @@ from users.user import User
 from .match import Match
 from lobby.lobby import Lobby
 
+
 class MatchService:
 
     def __init__(self):
         self.matches = []
 
-    def create_new_match(self, name: str, players: List[User] ) -> Match:
+    def create_new_match(self, name: str, players: List[User]) -> Match:
         match = Match(name, players)
         self.matches.append(Match(name, players))
 

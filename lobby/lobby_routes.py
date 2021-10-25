@@ -1,8 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from extensions import lobbyservice
-from extensions import matchservice
-from users.user import User
+from config import settings
 
 router = APIRouter()
 
@@ -11,12 +10,13 @@ router = APIRouter()
 async def get_lobbies():
     lobbies = lobbyservice.get_lobbies()
     return JSONResponse(content={'lobbies': [lobby.to_dict() for lobby in lobbies]},
-                        status_code=200)
+                        status_code=200, headers={"Access-Control-Allow-Origin": settings.ENDPOINT_CORS})
 
 
 @router.post('/create-lobby')
 async def create_lobby(name: str, host: str):
-    return JSONResponse(content={'info': 'Deprecated, use websockets instead'}, status_code=404)
+    return JSONResponse(content={'info': 'Deprecated, use websockets instead'}, status_code=404,
+                        headers={"Access-Control-Allow-Origin": settings.ENDPOINT_CORS})
 #
 #
 # @router.put('/join-player')

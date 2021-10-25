@@ -4,10 +4,12 @@ import websockets
 
 from lobby.lobby_ws import lobby_endpoints, create_lobby
 from matches.match_ws import match_endpoints
+from config import settings
+
 
 async def main_socket():
     # Runs on all ips available on the network
-    async with websockets.serve(endpoints, "0.0.0.0", 8080):
+    async with websockets.serve(endpoints, settings.WEBSOCKETS_IP, int(settings.WEBSOCKETS_PORT)):
         await asyncio.Future()  # Run forever
 
 

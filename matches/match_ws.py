@@ -22,6 +22,7 @@ async def end_turn(parsedjson, websocket: websockets.WebSocketServerProtocol, pa
 async def roll_dice(parsedjson, websocket: websockets.WebSocketServerProtocol, path):
     match_name = parsedjson['match_name']
     match = matchservice.get_match_by_name(match_name)
+    dice = match.roll_dice()
 
     for player in match.players:
-        await player.socket.send(json.dumps({'action': 'roll_dice', 'dice': match.roll_dice()}))
+        await player.socket.send(json.dumps({'action': 'roll_dice', 'dice': dice}))

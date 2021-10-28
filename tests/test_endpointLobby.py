@@ -41,3 +41,19 @@ class TestLobbyEndpoints(TestCaseFastAPI):
             self.assertEqual(data, {'action': 'match_started', 'match': {'name': 'test-lobby2',
                                                                     'players': ['host', 'test-player'],
                                                                     'turn': 0}})
+
+    def test_start_match_no_host(self):
+        with self.client.websocket_connect('/ws') as websocket:  
+            websocket.send_json({'action': 'lobby_join', 'player_name': 'test-player', 'lobby_name': 'test-lobby3'})
+            websocket.send_json({'action': 'lobby_start_match', 'player_name': 'test-player', 'lobby_name': 'test-lobby3'})
+            websocket.receive_json()
+            data = websocket.receive_json()
+            self.assertEqual(data['action'], 'failed')
+
+    def test_start_match_one_player(self):
+        with self.client.websocket_connect('/ws') as websocket:  
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-one-player'})
+            websocket.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-one-player'})
+            websocket.receive_json()
+            data = websocket.receive_json()
+            self.assertEqual(data['action'], 'failed')

@@ -8,7 +8,7 @@
 
 
 
-- ```python -m uvicorn main:app```
+- ```python -m uvicorn main:app --reload```
 
 # Tests
 
@@ -61,7 +61,7 @@ Returns:
 ### Start match
 
 Takes: 
-```{'action': 'lobby_join', 'player_name': str, 'lobby_name': str}```
+```{'action': 'lobby_start_match', 'player_name': str, 'lobby_name': str}```
 
 Returns:
 

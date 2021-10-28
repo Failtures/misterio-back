@@ -1,7 +1,6 @@
 from typing import List
 from users.user import User
 from .match import Match
-from lobby.lobby import Lobby
 
 
 class MatchService:
@@ -19,6 +18,4 @@ class MatchService:
         return self.matches
 
     def get_match_by_name(self, name) -> Match:
-        for match in self.matches:
-            if match.name == name:
-                return match
+        return next(m for m in self.matches if m.name == name)

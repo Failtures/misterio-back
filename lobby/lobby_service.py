@@ -43,3 +43,8 @@ class LobbyService:
 
     def get_player_in_lobby(self, lobby: Lobby, player: str):
         return next(start_player for start_player in lobby.players if start_player.nickname == player)
+
+    def delete_lobby(self, lobby: Lobby):
+        for player in lobby.players:
+            lobby.players.remove(player)
+        self.lobbies.remove(lobby)

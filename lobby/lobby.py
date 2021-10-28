@@ -40,3 +40,6 @@ class Lobby:
         return {'name': self.name, 'host': self.host.nickname,
                 'current_players': self.current_players(),
                 'players': [p.nickname for p in self.players]}
+
+    def is_host(self, user: User) -> bool:
+        return user == self.host

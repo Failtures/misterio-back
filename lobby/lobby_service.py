@@ -39,6 +39,8 @@ class LobbyService:
         if player in lobby.players:
             raise Exception('Duplicate player name')
 
+        if (len(lobby.players) == 6):
+            raise Exception('Lobby full')
         lobby.join(player)
 
     def get_player_in_lobby(self, lobby: Lobby, player: str):

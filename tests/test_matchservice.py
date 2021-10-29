@@ -34,8 +34,5 @@ class TestLobbyService(unittest.TestCase):
         self.assertEqual(self.match_service.get_match_by_name('test-match'),
                             Match('test-match', [User('host'), User('Player2')]), 
                             "The match was not found")
-        self.assertEqual(self.match_service.get_match_by_name('random-match'),
-                            None,
-                            "Match that should not be was found")
 
         

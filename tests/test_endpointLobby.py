@@ -14,6 +14,27 @@ class TestLobbyEndpoints(TestCaseFastAPI):
                 lobby = ['test-lobby1','test-lobby2','test-lobby3','test-lobby4','test-lobby5']
                 websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': lobby[i]})
 
+    def test_join_lobby_full(self):
+        with self.client.websocket_connect('/ws') as websocket:
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'lobby-full'})
+            players = ['player1','player2','player3','player4','player5','player6']
+            for i in range(6):
+                websocket.send_json({'action': 'lobby_join', 'player_name': players[i], 'lobby_name': 'lobby-full'})
+            for i in range(21):
+                websocket.receive_json()
+            
+            data=websocket.receive_json()
+            self.assertEqual(data['action'], 'failed')
+
+    def test_join_lobby_duplicate_player(self):
+        with self.client.websocket_connect('/ws') as websocket:
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'duplicate-name'})
+            websocket.send_json({'action': 'lobby_join', 'player_name': 'host', 'lobby_name': 'duplicate-name'})
+            websocket.receive_json()
+            
+            data=websocket.receive_json()
+            self.assertEqual(data['action'], 'failed')
+
     def test_get_lobbies(self):
         self.create_dummy_lobbies(5)
         res = self.client.get('/get-lobbies')

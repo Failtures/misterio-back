@@ -20,7 +20,7 @@ async def create_lobby(parsedjson, websocket):
         lobby = lobbyservice.create_new_lobby(lobbyname, user)
         await user.socket.send_json({'action': 'new_lobby', 'lobby': lobby.to_dict()})
     except Exception as e:
-        await websocket.send_json({'action': 'failed', 'info': e})
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
 
 
 async def join_lobby(parsedjson, websocket):

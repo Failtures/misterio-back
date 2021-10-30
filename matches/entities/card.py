@@ -15,3 +15,6 @@ class Card:
 
     def __eq__(self, other) -> bool:
         return self.name == other.name
+
+    def to_dict(self):
+        return {'type': self.type.name, 'name': self.name}

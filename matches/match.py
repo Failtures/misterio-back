@@ -10,9 +10,19 @@ class Match:
 
         self.name = name
         self.players = players
-
+        
         # Shuffle turn order
         random.shuffle(self.players)
+        
+        # self.cards is an array with the tuple (User, List [Cards]) 
+        self.cards = []
+        # For each player a tuple is created in self.cards
+        for players in self.players:
+            self.cards.append((players, []))
+
+        # self.mystery represents the envelope, will be a tuple (Card, Card, Card)
+        self.mystery = None
+
 
     def __eq__ (self, other):
         return self.name == other.name

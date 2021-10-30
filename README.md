@@ -29,6 +29,11 @@ Definitions
 Lobby:
 ``` {'name': str, 'host': str, 'current_players': int, 'players': [str] }```
 
+Card:
+```{'type': CardType, 'name': str}```
+
+CardType = ```{MONSTER, VICTIM, ROOM, SALEM_WITCH}```
+
 Error:
 ```{'action': 'failed', 'info': str}```
 * All endpoints return Error if there was one
@@ -79,6 +84,18 @@ Returns:
 To every player in the match
 
 ```{'action': 'roll_dice', 'dice': int}```
+
+### Get hand
+
+Description: Returns an array of the specified player's cards
+
+Takes:
+```{'action': 'match_get_hand', 'player_name': str, 'match_name': str}```
+
+Returns:
+
+To sender
+```{'action': 'get_hand', 'hand': [Card]}```
 
 ### End turn
 

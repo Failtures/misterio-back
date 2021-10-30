@@ -35,3 +35,26 @@ class TestMatchEndpoints(TestCaseFastAPI):
                     data = websocket.receive_json()
                     websocket.receive_json()
                     self.assertEqual(data, {'action': 'turn_passed', 'current_turn': 'host'})
+
+    def test_get_hand(self):
+        with self.client.websocket_connect('/ws') as websocket:
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-get-hand'})
+            websocket.receive_json()
+
+            websocket.send_json({'action': 'lobby_join', 'player_name': 'test-player', 'lobby_name': 'test-get-hand'})
+            #There are 2 receive per accion because there is one messege per player
+            websocket.receive_json()
+            websocket.receive_json()
+            
+            websocket.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-get-hand'})
+            websocket.receive_json()
+            websocket.receive_json()
+
+            websocket.send_json({'action': 'match_get_hand', 'player_name': 'host', 'match_name': 'test-get-hand'})
+            data = websocket.receive_json()
+
+            print(data)
+            self.assertEqual(data['action'], 'get_hand')
+            self.assertEqual(len(data['hand']), 9)
+
+

@@ -1,5 +1,6 @@
 import random
 from typing import List
+from matches.entities.card import Card
 from users.user import User
 
 
@@ -41,3 +42,9 @@ class Match:
 
     def to_dict(self):
         return {'name': self.name, 'players': [p.nickname for p in self.players], 'turn': self._currentturn}
+
+    def get_hand(self, player: str) -> List[Card]:
+        for i in range(0, len(self.players)):
+            if self.cards[i][0].nickname == player:
+                return self.cards[i][1]
+        raise Exception("Player doesn't exist in match")

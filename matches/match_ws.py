@@ -6,6 +6,8 @@ async def match_endpoints(parsedjson, websocket):
         await end_turn(parsedjson, websocket)
     elif parsedjson['action'] == 'match_roll_dice':
         await roll_dice(parsedjson, websocket)
+    elif parsedjson['action'] == 'match_get_hand':
+        await get_hand(parsedjson, websocket)
 
 
 async def end_turn(parsedjson, websocket):
@@ -42,3 +44,24 @@ async def roll_dice(parsedjson, websocket):
 
     for player in match.players:
         await player.socket.send_json({'action': 'roll_dice', 'dice': dice})
+
+async def get_hand(parsedjson, websocket):
+    try:
+        match_name = parsedjson['match_name']
+        match = matchservice.get_match_by_name(match_name)
+        player_name = parsedjson['player_name']
+        player = matchservice.get_player_in_match(match, player_name)
+        hand = match.get_hand(player_name)
+    except Exception as e:
+        await websocket.socket.send_json({'action': 'failed', 'info': str(e)})
+        return
+
+    if websocket.client.host != player.socket.client.host:
+        await websocket.client.socket.send_json(
+            {'action': 'failed', 'info': "You are not ${player.nickname}"})
+
+    for i in range(0, len(hand)):
+        hand[i] = hand[i].to_dict()
+
+    await player.socket.send_json({'action': 'get_hand', 'hand': hand})
+    

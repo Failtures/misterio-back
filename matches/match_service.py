@@ -10,7 +10,7 @@ class MatchService:
 
     def create_new_match(self, name: str, players: List[User]) -> Match:
         match = Match(name, players)
-        self.matches.append(Match(name, players))
+        self.matches.append(match)
 
         return match
 

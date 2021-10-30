@@ -7,6 +7,7 @@
 - [Notes for developers](#notes-for-developers)
 - [Board organization](#board-organization)
 - [Websockets protocol](#websockets-protocol)
+  * [Definitions](#definitions)
   * [Lobby endpoint](#lobby-endpoint)
     + [Join lobby](#join-lobby)
     + [Create lobby](#create-lobby)
@@ -49,7 +50,7 @@ that leads to a room, that player is considered to be in that room
 
 # Websockets protocol
 
-Definitions
+## Definitions
 
 Lobby:
 ``` {'name': str, 'host': str, 'current_players': int, 'players': [str] }```

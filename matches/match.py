@@ -37,5 +37,5 @@ class Match:
         return self.players[self._currentturn]
 
     def to_dict(self):
-        return {'name': self.name, 'players': [p.nickname for p in self.players], 'turn': self._currentturn,
+        return {'name': self.name, 'players': [p.nickname for p in self.players], 'turn': self.current_turn().nickname,
                 'player_positions': self.board.players}

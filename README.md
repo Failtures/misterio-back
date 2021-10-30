@@ -1,3 +1,21 @@
+# Misterio backend
+
+### Table of contents
+- [Install](#install)
+- [Run](#run)
+- [Tests](#tests)
+- [Notes for developers](#notes-for-developers)
+- [Board organization](#board-organization)
+- [Websockets protocol](#websockets-protocol)
+  * [Lobby endpoint](#lobby-endpoint)
+    + [Join lobby](#join-lobby)
+    + [Create lobby](#create-lobby)
+    + [Start match](#start-match)
+  * [Match endpoint](#match-endpoint)
+    + [Roll dice](#roll-dice)
+    + [End turn](#end-turn)
+
+
 # Install
 
 
@@ -22,12 +40,22 @@
 
 - All tests using the FastAPI test client should extend the TestCaseFastAPI class
 
+# Board organization
+
+There's a number assigned to every square in the board. If a player steps into a square
+that leads to a room, that player is considered to be in that room
+
+![](resources/misterio_board.jpg)
+
 # Websockets protocol
 
 Definitions
 
 Lobby:
 ``` {'name': str, 'host': str, 'current_players': int, 'players': [str] }```
+
+Match:
+```{'name': self.name, 'players': [str], 'turn': str, 'player_positions': {'player_name': int, ..} }```
 
 Error:
 ```{'action': 'failed', 'info': str}```

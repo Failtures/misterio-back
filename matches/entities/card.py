@@ -2,14 +2,14 @@ from enum import Enum
 
 class CardType(Enum):
 
-    MONSTER = 1
-    VICTIM = 2
-    ROOM = 3
-    SALEM_WITCH = 4
+    MONSTER = "Monster"
+    VICTIM = "Victim"
+    ROOM = "Room"
+    SALEM_WITCH = "Salem Witch"
 
 class Card:
 
-    def __init__(self, type: int, name: str) -> None:
+    def __init__(self, type: str, name: str) -> None:
         self.type = CardType(type)            
         self.name = name
 

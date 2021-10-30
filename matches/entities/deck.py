@@ -9,13 +9,13 @@ class Deck:
 
         # Define the deck
         self.cards = [
-            Card(1, "Dracula"), Card(1, "Frankenstein"), Card(1, "Werewolf"),
-            Card(1, "Ghost"), Card(1, "Mummy"), Card(1, "Dr. Jekyll and Mr Hyde"),
-            Card(2, "Count"), Card(2, "Countess"), Card(2, "Housekeeper"),
-            Card(2, "Butler"), Card(2, "Maid"), Card(2, "Gardener"),
-            Card(3, "Bedroom"), Card(3, "Library"), Card(3, "Cellar"),
-            Card(3, "Garage"), Card(3, "Laboratory"), Card(3, "Pantheon"),
-            Card(3, "Lounge"), Card(3, "Lobby"), Card(4, "Salem Witch")
+            Card("Monster", "Dracula"), Card("Monster", "Frankenstein"), Card("Monster", "Werewolf"),
+            Card("Monster", "Ghost"), Card("Monster", "Mummy"), Card("Monster", "Dr. Jekyll and Mr Hyde"),
+            Card("Victim", "Count"), Card("Victim", "Countess"), Card("Victim", "Housekeeper"),
+            Card("Victim", "Butler"), Card("Victim", "Maid"), Card("Victim", "Gardener"),
+            Card("Room", "Bedroom"), Card("Room", "Library"), Card("Room", "Cellar"),
+            Card("Room", "Garage"), Card("Room", "Laboratory"), Card("Room", "Pantheon"),
+            Card("Room", "Lounge"), Card("Room", "Lobby"), Card("Salem Witch", "Salem Witch")
         ]
 
         # Define the mystery

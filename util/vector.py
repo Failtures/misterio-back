@@ -8,10 +8,13 @@ class Vector2d:
         self.x = x
         self.y = y
 
-    def distance_to(self, other: Vector2d):
+    def non_diagonal_distance_to(self, other: Vector2d):
         dist1 = abs(self.x - other.x)
         dist2 = abs(self.y - other.y)
         return dist1 + dist2
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
+
+    def __str__(self):
+        return f'({self.x}, {self.y})'

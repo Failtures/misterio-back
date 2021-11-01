@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class SquareType(Enum):
+    NONE = 0
     REGULAR = 1
     TRAP = 2
     ANIMAL = 3

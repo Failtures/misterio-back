@@ -1,7 +1,8 @@
+import random
+
 from .square import Square, SquareType
 from typing import List
 from util.vector import Vector2d
-import random
 
 
 class Board:
@@ -10,7 +11,6 @@ class Board:
     HEIGHT = 20
 
     TRAPS = [(6, 6), (13, 6), (6, 13), (13, 13)]
-    STARTING_SQUARES = [(0, 6), (6, 0), (13, 0), (0, 13), (19, 6), (6, 19), (19, 13), (13, 19)]
 
     ROOM_LIVING = [(3, 6), (6, 9), (4, 13)]
     ROOM_CELLAR = [(6, 4)]
@@ -22,15 +22,17 @@ class Board:
     ROOM_DINING = [(10, 6)]
 
     def __init__(self, players: List[str]):
+        self.STARTING_SQUARES = [(0, 6), (6, 0), (13, 0), (0, 13), (19, 6), (6, 19), (19, 13), (13, 19)]
         self.squares = []
         # {'player_name': Vector2d(x, y), ... }
-        self.players = {}
+        self.player_position = {}
 
-        # Assign random starting squares to players
+        # Assign starting positions to players
+        index = 0
         for p in players:
-            i = random.randrange(0, len(self.STARTING_SQUARES))
-            self.players[p] = Vector2d(self.STARTING_SQUARES[i][0], self.STARTING_SQUARES[i][1])
-            self.STARTING_SQUARES.pop(i)
+            self.player_position[p] = Vector2d(self.STARTING_SQUARES[index][0], self.STARTING_SQUARES[index][1])
+            self.STARTING_SQUARES.pop(index)
+            index += 1
 
         # Init board squares
         for i in range(0, self.WIDTH):
@@ -38,7 +40,7 @@ class Board:
             for j in range(0, self.HEIGHT):
                 # Some coordinates aren't supposed to have squares in them, so we fill with None
                 if (i < 6 or 6 < i < 13 or i > 13) and (j < 6 or 13 > j > 6 or j > 13):
-                    sublist.append(None)
+                    sublist.append(Square(SquareType.NONE))
                 else:
                     sublist.append(self.__get_room(i, j))
             self.squares.append(sublist)
@@ -67,14 +69,25 @@ class Board:
 
         return room
 
-    def move_player(self, position: Vector2d, player_name) -> Square:
-        self.players[player_name] = position
+    def move_player(self, position: Vector2d, player_name: str, moves: int) -> Square:
+        player_pos = self.player_position[player_name]
+        required_moves = player_pos.non_diagonal_distance_to(position)
+        target_square = self.squares[position.x][position.y]
+        trap_to_trap = target_square.squaretype is SquareType.TRAP and \
+                       self.get_player_square(player_name).squaretype is SquareType.TRAP
 
-        return self.squares[position.x][position.y]
+        if required_moves > moves and not trap_to_trap:
+            raise Exception(f'Target square is too far away moves: {moves}, moves required: {required_moves}')
+        if self.squares[position.x][position.y].squaretype is SquareType.NONE:
+            raise Exception('Selected square is not suitable')
+
+        self.player_position[player_name] = position
+
+        return self.squares[position.x][position.y].squaretype.name
 
     def get_player_position(self, player_name) -> Vector2d:
-        return self.players[player_name]
+        return self.player_position[player_name]
 
     def get_player_square(self, player_name) -> Square:
-        p = self.players[player_name]
+        p = self.player_position[player_name]
         return self.squares[p.x][p.y]

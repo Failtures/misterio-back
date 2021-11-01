@@ -8,9 +8,10 @@ from util.vector import Vector2d
 class Match:
 
     def __init__(self, name: str, players: List[User]):
-        self._currentturn = 0
-        self._rolleddice = False
-        self._currentroll = 0
+        self._current_turn = 0
+        self._rolled_dice = False
+        self._moved = False
+        self._current_roll = 0
 
         self.name = name
         self.players = players
@@ -23,32 +24,33 @@ class Match:
         return self.name == other.name
 
     def next_turn(self) -> User:
-        self._currentturn += 1
-        self._currentturn %= len(self.players)
-        self._rolleddice = False
+        self._current_turn += 1
+        self._current_turn %= len(self.players)
+        # Reset flags
+        self._rolled_dice = False
+        self._moved = False
 
         return self.current_turn()
 
     def roll_dice(self) -> int:
-        if self._rolleddice:
+        if self._rolled_dice:
             raise Exception('Already rolled dice this turn')
-        self._rolleddice = True
-        self._currentroll = random.randrange(1, 7)
-        return self._currentroll
+        self._rolled_dice = True
+        self._current_roll = random.randrange(1, 7)
+        return self._current_roll
 
     def current_turn(self) -> User:
-        return self.players[self._currentturn]
+        return self.players[self._current_turn]
 
     def to_dict(self):
         return {'name': self.name, 'players': [p.nickname for p in self.players], 'turn': self.current_turn().nickname,
-                'player_positions': self.board.players}
+                'player_positions': self.board.player_position}
 
     def move(self, position: Vector2d):
-        player = self.current_turn()
-        currentpos = self.board.get_player_position(player.nickname)
-        distance = currentpos.distance_to(position)
+        if not self._rolled_dice:
+            raise Exception('You must roll the dice before moving')
+        if self._moved:
+            raise Exception("You can't move twice in the same turn")
 
-        if self._rolleddice and distance > self._currentroll:
-            raise Exception("Can't move more spaces than the dice roll value")
-
-        self.board.move_player(position, self.current_turn().nickname)
+        self.board.move_player(position, self.current_turn().nickname, self._current_roll)
+        self._moved = True

@@ -1,4 +1,5 @@
 from extensions import matchservice
+from matches.entities.card import Card
 
 
 async def match_endpoints(parsedjson, websocket):
@@ -8,6 +9,8 @@ async def match_endpoints(parsedjson, websocket):
         await roll_dice(parsedjson, websocket)
     elif parsedjson['action'] == 'match_get_hand':
         await get_hand(parsedjson, websocket)
+    elif parsedjson['action'] == 'match_use_witch':
+        await use_salem_witch(parsedjson, websocket)        
 
 
 async def end_turn(parsedjson, websocket):
@@ -45,6 +48,7 @@ async def roll_dice(parsedjson, websocket):
     for player in match.players:
         await player.socket.send_json({'action': 'roll_dice', 'dice': dice})
 
+
 async def get_hand(parsedjson, websocket):
     try:
         match_name = parsedjson['match_name']
@@ -65,3 +69,27 @@ async def get_hand(parsedjson, websocket):
 
     await player.socket.send_json({'action': 'get_hand', 'hand': hand})
     
+
+async def use_salem_witch(parsedjson, websocket):
+    try:
+        match_name = parsedjson['match_name']
+        match = matchservice.get_match_by_name(match_name)
+        player_name = parsedjson['player_name']
+        player = matchservice.get_player_in_match(match, player_name)
+        card_type = parsedjson['card_type']
+
+    except Exception as e:
+        await websocket.socket.send_json({'action': 'failed', 'info': str(e)})
+        return
+
+    # Check if Salem Witch is in the player hand
+    if match.player_has_witch(player_name):
+        if card_type == "Monster":
+            await player.socket.send_json({'action': 'mystery', 'card': match.mystery[0].to_dict()})
+        elif card_type == "Victim":
+            await player.socket.send_json({'action': 'mystery', 'card': match.mystery[1].to_dict()})
+        elif card_type == "Room":
+            await player.socket.send_json({'action': 'mystery', 'card': match.mystery[2].to_dict()})
+        match.delete_witch(player_name)
+    else:
+        await player.socket.send_json({'action': 'failed', 'info': "You don't have the salem witch"})

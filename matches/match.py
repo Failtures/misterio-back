@@ -48,3 +48,18 @@ class Match:
             if self.cards[i][0].nickname == player:
                 return self.cards[i][1]
         raise Exception("Player doesn't exist in match")
+
+    # Return true if player has the salem witch in hand
+    # TODO improve has_witch and delete_witch
+    def player_has_witch(self, player: str) -> bool:
+        for i in range(0, len(self.players)):
+            if self.cards[i][0].nickname == player:
+                return any(c['name'] == "Salem Witch" for c in self.cards[i][1])
+
+    def delete_witch(self, player) -> None:
+        for i in range(0, len(self.players)):
+            if self.cards[i][0].nickname == player:
+                for j in range(0, len(self.cards[i][1])):
+                    if self.cards[i][1][j]['name'] == "Salem Witch":
+                        self.cards[i][1].pop(j)
+                        return

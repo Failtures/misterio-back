@@ -3,36 +3,22 @@ from enum import Enum
 
 class SquareType(Enum):
     REGULAR = 1
-    ROOM = 2
-    TRAP = 3
-    ANIMAL = 4
-
-
-class RoomType(Enum):
-    LIVING = 1
-    CELLAR = 2
-    LABORATORY = 3
-    PANTHEON = 4
-    LIBRARY = 5
-    GARAGE = 6
-    BEDROOM = 7
+    TRAP = 2
+    ANIMAL = 3
+    LIVING = 4
+    CELLAR = 5
+    LABORATORY = 6
+    PANTHEON = 7
+    LIBRARY = 8
+    GARAGE = 9
+    BEDROOM = 10
+    DINING = 11
 
 
 class Square:
 
-    def __init__(self, position, squaretype: SquareType):
-        self.position = position
-        self.squareType = squaretype
+    def __init__(self, squaretype: SquareType):
+        self.squaretype = squaretype
 
-
-class Room(Square):
-
-    def __init__(self, position: int, roomtype: RoomType):
-        super().__init__(position, SquareType.ROOM)
-        self.roomtype = roomtype
-
-
-class Animal(Square):
-
-    def __init__(self, position: int, name: str):
-        super().__init__(position, SquareType.ANIMAL)
+    def __str__(self):
+        return (str(self.squaretype.name)).lower().title()

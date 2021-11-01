@@ -43,10 +43,11 @@
 
 # Board organization
 
-There's a number assigned to every square in the board. If a player steps into a square
-that leads to a room, that player is considered to be in that room
+There's a set of x,y coordinates assigned to every square in the board. 
+If a player steps into a square that leads to a room, that player is 
+considered to be in that room. Invalid squares (i.e, the square (1,1)) are set as null.
 
-![](resources/misterio_board.jpg)
+![](resources/MisterioBoard_coords.jpeg)
 
 # Websockets protocol
 

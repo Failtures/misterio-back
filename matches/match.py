@@ -19,7 +19,7 @@ class Match:
         self.cards = []
         # For each player a tuple is created in self.cards
         for players in self.players:
-            self.cards.append((players, []))
+            self.cards.append([])
 
         # self.mystery represents the envelope, will be a tuple (Card, Card, Card)
         self.mystery = None
@@ -45,21 +45,25 @@ class Match:
 
     def get_hand(self, player: str) -> List[Card]:
         for i in range(0, len(self.players)):
-            if self.cards[i][0].nickname == player:
-                return self.cards[i][1]
+            if self.players[i].nickname == player:
+                return self.cards[i]
         raise Exception("Player doesn't exist in match")
 
     # Return true if player has the salem witch in hand
-    # TODO improve has_witch and delete_witch
     def player_has_witch(self, player: str) -> bool:
-        for i in range(0, len(self.players)):
-            if self.cards[i][0].nickname == player:
-                return any(c['name'] == "Salem Witch" for c in self.cards[i][1])
+        try:
+            hand = self.get_hand(player)
+            return any(c.name == "Salem Witch" for c in hand)
+        except Exception:
+            raise Exception("Player doesn't exist in match")
 
+    # Delete the witch of salem from the player's hand
     def delete_witch(self, player) -> None:
-        for i in range(0, len(self.players)):
-            if self.cards[i][0].nickname == player:
-                for j in range(0, len(self.cards[i][1])):
-                    if self.cards[i][1][j]['name'] == "Salem Witch":
-                        self.cards[i][1].pop(j)
-                        return
+        try:
+            hand = self.get_hand(player)
+            for i in range(0, len(hand)):
+                if hand[i].name == "Salem Witch":
+                    hand.pop(i)
+                    return
+        except Exception:
+            raise Exception("Player doesn't exist in match")

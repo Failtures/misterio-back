@@ -32,4 +32,4 @@ class Deck:
     def deal_cards(self) -> None:
         n_players = len(self.match.players)
         for i in range (0,18):
-            self.match.cards[i%n_players][1].append(self.cards[i])
+            self.match.cards[i%n_players].append(self.cards[i])

@@ -67,6 +67,7 @@ async def start_match(parsedjson, websocket):
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
 
+
 async def lobby_leave(parsedjson, websocket):
     try:
         player = parsedjson['player_name']
@@ -75,12 +76,12 @@ async def lobby_leave(parsedjson, websocket):
         lobby = lobbyservice.get_lobby_by_name(lobbyname)
         leave_player = lobbyservice.get_player_in_lobby(lobby, player)
 
-        #If the person who want to leave the lobby is the host: any player is removed and the lobby is deleted.
+        # If the person who want to leave the lobby is the host: any player is removed and the lobby is deleted.
         if(lobby.is_host(leave_player)):
             lobbyservice.delete_lobby(lobby)
             await websocket.send_json({'action': 'lobby_removed', 'lobby_name': lobby.name})
 
-        #If a non-host player want to leave the lobby: It's removed and the other players are notificed. 
+        # If a non-host player want to leave the lobby: It's removed and the other players are notificed.
         if(leave_player in lobby.players):
             lobby.players.remove(leave_player)
             for lobbyplayer in lobby.players:

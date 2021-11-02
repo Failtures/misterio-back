@@ -1,3 +1,22 @@
+# Misterio backend
+
+### Table of contents
+- [Install](#install)
+- [Run](#run)
+- [Tests](#tests)
+- [Notes for developers](#notes-for-developers)
+- [Board organization](#board-organization)
+- [Websockets protocol](#websockets-protocol)
+  * [Definitions](#definitions)
+  * [Lobby endpoint](#lobby-endpoint)
+    + [Join lobby](#join-lobby)
+    + [Create lobby](#create-lobby)
+    + [Start match](#start-match)
+  * [Match endpoint](#match-endpoint)
+    + [Roll dice](#roll-dice)
+    + [End turn](#end-turn)
+
+
 # Install
 
 
@@ -22,17 +41,30 @@
 
 - All tests using the FastAPI test client should extend the TestCaseFastAPI class
 
+# Board organization
+
+There's a set of x,y coordinates assigned to every square in the board. 
+If a player steps into a square that leads to a room, that player is 
+considered to be in that room. Invalid squares (i.e, the square (1,1)) are set as null.
+
+![](resources/MisterioBoard_coords.jpeg)
+
 # Websockets protocol
 
-Definitions
+## Definitions
 
 Lobby:
 ``` {'name': str, 'host': str, 'current_players': int, 'players': [str] }```
+
+
+Match:
+```{'name': self.name, 'players': [str], 'turn': str, 'player_positions': {'player_name': {'pos_x': <int>, 'pos_y': <int>}}}```
 
 Card:
 ```{'type': CardType, 'name': str}```
 
 CardType = ```{MONSTER, VICTIM, ROOM, SALEM_WITCH}```
+
 
 Error:
 ```{'action': 'failed', 'info': str}```
@@ -121,3 +153,13 @@ Returns:
 To every player in the match
 
 ```{'action': 'turn_passed', 'current_turn': str}```
+
+### Move
+
+Takes:
+```{'action': 'match_move', 'match_name': <str>, 'pos_x': <int>, 'pos_y': <int>}```
+
+Returns:
+
+To every player in the match
+```{'action': 'player_position', 'pos_x': <int>, 'pos_y': <int>, 'square': <str>}```

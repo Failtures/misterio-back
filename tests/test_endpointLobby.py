@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from working_test_case import TestCaseFastAPI
+from .working_test_case import TestCaseFastAPI
 from main import app
 
 

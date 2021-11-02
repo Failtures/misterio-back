@@ -1,10 +1,13 @@
 from extensions import matchservice
+from util.vector import Vector2d
 
 async def match_endpoints(parsedjson, websocket):
     if parsedjson['action'] == 'match_end_turn':
         await end_turn(parsedjson, websocket)
     elif parsedjson['action'] == 'match_roll_dice':
         await roll_dice(parsedjson, websocket)
+    elif parsedjson['action'] == 'match_move':
+        await move(parsedjson, websocket)
     elif parsedjson['action'] == 'match_get_hand':
         await get_hand(parsedjson, websocket)
     elif parsedjson['action'] == 'match_use_witch':
@@ -16,12 +19,12 @@ async def end_turn(parsedjson, websocket):
         match_name = parsedjson['match_name']
         match = matchservice.get_match_by_name(match_name)
     except Exception as e:
-        websocket.send_json({'action': 'failed', 'info': str(e)})
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
 
     # Fails if is not the turn of the requesting player
     if match.current_turn().socket.client.host != websocket.client.host:
-        websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
+        await websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
         return
     match.next_turn()
 
@@ -46,6 +49,18 @@ async def roll_dice(parsedjson, websocket):
     for player in match.players:
         await player.socket.send_json({'action': 'roll_dice', 'dice': dice})
 
+
+async def move(parsedjson, websocket):
+    try:
+        match_name = parsedjson['match_name']
+        position = Vector2d(int(parsedjson['pos_x']), int(parsedjson['pos_y']))
+        match = matchservice.get_match_by_name(match_name)
+        square = match.move(position)
+        new_pos = match.board.get_player_position(match.current_turn().nickname)
+
+        for player in match.players:
+            await player.socket.send_json({'action': 'player_position',
+                                            'pos_x': new_pos.x, 'pos_y': new_pos.y, 'square': str(square)})
 
 async def get_hand(parsedjson, websocket):
     try:
@@ -75,11 +90,11 @@ async def use_salem_witch(parsedjson, websocket):
         player_name = parsedjson['player_name']
         player = matchservice.get_player_in_match(match, player_name)
         card_type = parsedjson['card_type']
-
+    
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
-
+    
     # Check if Salem Witch is in the player hand
     try:
         if match.player_has_witch(player_name):

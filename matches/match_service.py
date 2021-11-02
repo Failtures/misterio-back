@@ -1,6 +1,7 @@
 from typing import List
 from users.user import User
 from .match import Match
+from .entities.deck import Deck
 
 
 class MatchService:
@@ -12,6 +13,11 @@ class MatchService:
         match = Match(name, players)
         self.matches.append(match)
 
+        deck = Deck(match)
+        deck.deal_cards()
+
+        self.matches.append(match)
+        
         return match
 
     def get_matches(self) -> List[Match]:
@@ -19,3 +25,6 @@ class MatchService:
 
     def get_match_by_name(self, name) -> Match:
         return next(m for m in self.matches if m.name == name)
+
+    def get_player_in_match(self, match: Match, player: str):
+        return next(start_player for start_player in match.players if start_player.nickname == player)

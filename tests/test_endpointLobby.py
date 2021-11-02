@@ -88,3 +88,29 @@ class TestLobbyEndpoints(TestCaseFastAPI):
             websocket.receive_json()
             data = websocket.receive_json()
             self.assertEqual(data['action'], 'failed')
+
+    def test_leave_lobby(self):
+        with self.client.websocket_connect('/ws') as websocket: 
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-leave-lobby'})
+            websocket.send_json({'action': 'lobby_join', 'player_name': 'test-player', 'lobby_name': 'test-leave-lobby'})
+            websocket.send_json({'action': 'lobby_leave', 'player_name': 'test-player', 'lobby_name': 'test-leave-lobby'})
+            for i in range(3):
+                websocket.receive_json()
+            data = websocket.receive_json()
+            self.assertEqual(data,{'action': 'player_leaved', 'player_name': 'test-player'})
+
+    def test_leave_lobby_host(self):
+        with self.client.websocket_connect('/ws') as websocket: 
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-leave-host'})
+            websocket.send_json({'action': 'lobby_join', 'player_name': 'test-player', 'lobby_name': 'test-leave-host'})
+            websocket.send_json({'action': 'lobby_leave', 'player_name': 'host', 'lobby_name': 'test-leave-host'})
+            for i in range(3):
+                websocket.receive_json()
+            data = websocket.receive_json()
+            self.assertEqual(data,{'action': 'lobby_removed', 'lobby_name': 'test-leave-host'})
+
+    def test_leave_no_lobby(self):
+        with self.client.websocket_connect('/ws') as websocket: 
+            websocket.send_json({'action': 'lobby_leave', 'player_name': 'player', 'lobby_name': 'test-leave-no-lobby'})
+            data = websocket.receive_json()
+            self.assertEqual(data['action'],'failed')

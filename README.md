@@ -56,8 +56,15 @@ considered to be in that room. Invalid squares (i.e, the square (1,1)) are set a
 Lobby:
 ``` {'name': str, 'host': str, 'current_players': int, 'players': [str] }```
 
+
 Match:
 ```{'name': self.name, 'players': [str], 'turn': str, 'player_positions': {'player_name': {'pos_x': <int>, 'pos_y': <int>}}}```
+
+Card:
+```{'type': CardType, 'name': str}```
+
+CardType = ```{MONSTER, VICTIM, ROOM, SALEM_WITCH}```
+
 
 Error:
 ```{'action': 'failed', 'info': str}```
@@ -67,8 +74,8 @@ Error:
 
 ### Join lobby
 
-Takes: ```{'action': 'lobby_join', 'player_name': str, 
-'lobby_name': str}```
+Takes: 
+```{'action': 'lobby_join', 'player_name': str, 'lobby_name': str}```
 
 Returns:
 
@@ -109,6 +116,30 @@ Returns:
 To every player in the match
 
 ```{'action': 'roll_dice', 'dice': int}```
+
+### Get hand
+
+Description: Returns an array of the specified player's cards
+
+Takes:
+```{'action': 'match_get_hand', 'player_name': str, 'match_name': str}```
+
+Returns:
+
+To sender
+```{'action': 'get_hand', 'hand': [Card]}```
+
+### Use Salem Witch
+
+Description: Allows the player to use the witch of salem, then removes
+
+Takes:
+```{'action': 'match_use_witch', 'player_name': str, 'match_name': str, card_type: CardType}```
+
+Returns:
+
+To sender
+```{'action': 'mystery_card', 'card': Card}```
 
 ### End turn
 

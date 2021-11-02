@@ -83,13 +83,17 @@ async def use_salem_witch(parsedjson, websocket):
         return
 
     # Check if Salem Witch is in the player hand
-    if match.player_has_witch(player_name):
-        if card_type == "Monster":
-            await player.socket.send_json({'action': 'mystery', 'card': match.mystery[0].to_dict()})
-        elif card_type == "Victim":
-            await player.socket.send_json({'action': 'mystery', 'card': match.mystery[1].to_dict()})
-        elif card_type == "Room":
-            await player.socket.send_json({'action': 'mystery', 'card': match.mystery[2].to_dict()})
-        match.delete_witch(player_name)
-    else:
-        await player.socket.send_json({'action': 'failed', 'info': "You don't have the salem witch"})
+    try:
+        if match.player_has_witch(player_name):
+            if card_type == "MONSTER":
+                await player.socket.send_json({'action': 'mystery_card', 'card': match.mystery[0].to_dict()})
+            elif card_type == "VICTIM":
+                await player.socket.send_json({'action': 'mystery_card', 'card': match.mystery[1].to_dict()})
+            elif card_type == "ROOM":
+                await player.socket.send_json({'action': 'mystery_card', 'card': match.mystery[2].to_dict()})
+            match.delete_witch(player_name)
+        else:
+            await player.socket.send_json({'action': 'failed', 'info': "You don't have the salem witch"})
+    except Exception as e:
+        await websocket.socket.send_json({'action': 'failed', 'info': str(e)})
+        return

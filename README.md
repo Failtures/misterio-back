@@ -29,6 +29,11 @@ Definitions
 Lobby:
 ``` {'name': str, 'host': str, 'current_players': int, 'players': [str] }```
 
+Card:
+```{'type': CardType, 'name': str}```
+
+CardType = ```{MONSTER, VICTIM, ROOM, SALEM_WITCH}```
+
 Error:
 ```{'action': 'failed', 'info': str}```
 * All endpoints return Error if there was one
@@ -37,8 +42,8 @@ Error:
 
 ### Join lobby
 
-Takes: ```{'action': 'lobby_join', 'player_name': str, 
-'lobby_name': str}```
+Takes: 
+```{'action': 'lobby_join', 'player_name': str, 'lobby_name': str}```
 
 Returns:
 
@@ -79,6 +84,30 @@ Returns:
 To every player in the match
 
 ```{'action': 'roll_dice', 'dice': int}```
+
+### Get hand
+
+Description: Returns an array of the specified player's cards
+
+Takes:
+```{'action': 'match_get_hand', 'player_name': str, 'match_name': str}```
+
+Returns:
+
+To sender
+```{'action': 'get_hand', 'hand': [Card]}```
+
+### Use Salem Witch
+
+Description: Allows the player to use the witch of salem, then removes
+
+Takes:
+```{'action': 'match_use_witch', 'player_name': str, 'match_name': str, card_type: CardType}```
+
+Returns:
+
+To sender
+```{'action': 'mystery_card', 'card': Card}```
 
 ### End turn
 

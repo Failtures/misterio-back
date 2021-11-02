@@ -15,7 +15,7 @@ class Deck:
             Card("Victim", "Butler"), Card("Victim", "Maid"), Card("Victim", "Gardener"),
             Card("Room", "Bedroom"), Card("Room", "Library"), Card("Room", "Cellar"),
             Card("Room", "Garage"), Card("Room", "Laboratory"), Card("Room", "Pantheon"),
-            Card("Room", "Lounge"), Card("Room", "Lobby"), Card("Salem Witch", "Salem Witch")
+            Card("Room", "Dining"), Card("Room", "Living"), Card("Salem Witch", "Salem Witch")
         ]
 
         # Define the mystery

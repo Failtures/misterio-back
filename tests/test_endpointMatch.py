@@ -118,3 +118,21 @@ class TestMatchEndpoints(TestCaseFastAPI):
                                     'match_name': 'test-use-witch-twice', 'card_type': "MONSTER"})
                 data = websocket.receive_json()
                 self.assertEqual(data['action'], "failed")
+
+    def test_no_player_use_witch(self):
+        with self.client.websocket_connect('/ws') as websocket:
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-no-player'})
+            websocket.receive_json()
+
+            websocket.send_json({'action': 'lobby_join', 'player_name': 'test-player', 'lobby_name': 'test-no-player'})
+            websocket.receive_json()
+            websocket.receive_json()
+            
+            websocket.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-no-player'})
+            websocket.receive_json()
+            websocket.receive_json()
+
+            websocket.send_json({'action': 'match_use_witch', 'player_name': 'no-player',
+                                'match_name': 'test-no-player', 'card_type': "MONSTER"})
+            data = websocket.receive_json()
+            self.assertEqual(data['action'], "failed")

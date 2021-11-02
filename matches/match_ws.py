@@ -1,6 +1,4 @@
 from extensions import matchservice
-from matches.entities.card import Card
-
 
 async def match_endpoints(parsedjson, websocket):
     if parsedjson['action'] == 'match_end_turn':
@@ -57,7 +55,7 @@ async def get_hand(parsedjson, websocket):
         player = matchservice.get_player_in_match(match, player_name)
         hand = match.get_hand(player_name)
     except Exception as e:
-        await websocket.socket.send_json({'action': 'failed', 'info': str(e)})
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
 
     if websocket.client.host != player.socket.client.host:
@@ -79,7 +77,7 @@ async def use_salem_witch(parsedjson, websocket):
         card_type = parsedjson['card_type']
 
     except Exception as e:
-        await websocket.socket.send_json({'action': 'failed', 'info': str(e)})
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
 
     # Check if Salem Witch is in the player hand
@@ -95,5 +93,5 @@ async def use_salem_witch(parsedjson, websocket):
         else:
             await player.socket.send_json({'action': 'failed', 'info': "You don't have the salem witch"})
     except Exception as e:
-        await websocket.socket.send_json({'action': 'failed', 'info': str(e)})
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
         return

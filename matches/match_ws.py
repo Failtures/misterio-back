@@ -47,7 +47,6 @@ async def roll_dice(parsedjson, websocket):
         await player.socket.send_json({'action': 'roll_dice', 'dice': dice})
 
 
-# {'action': 'match_move', 'match_name': <str>, 'pos_x': <int>, 'pos_y': <int>}
 async def move(parsedjson, websocket):
     try:
         match_name = parsedjson['match_name']

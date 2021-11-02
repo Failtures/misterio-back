@@ -57,7 +57,7 @@ Lobby:
 ``` {'name': str, 'host': str, 'current_players': int, 'players': [str] }```
 
 Match:
-```{'name': self.name, 'players': [str], 'turn': str, 'player_positions': {'player_name': int, ..} }```
+```{'name': self.name, 'players': [str], 'turn': str, 'player_positions': {'player_name': {'pos_x': <int>, 'pos_y': <int>}}}```
 
 Error:
 ```{'action': 'failed', 'info': str}```
@@ -122,3 +122,13 @@ Returns:
 To every player in the match
 
 ```{'action': 'turn_passed', 'current_turn': str}```
+
+### Move
+
+Takes:
+```{'action': 'match_move', 'match_name': <str>, 'pos_x': <int>, 'pos_y': <int>}```
+
+Returns:
+
+To every player in the match
+```{'action': 'player_position', 'pos_x': <int>, 'pos_y': <int>, 'square': <str>}```

@@ -39,7 +39,7 @@ class TestBoard(unittest.TestCase):
         self.assertTrue(False, 'Player moved more than 6 spaces')
 
     def test_cannot_move_twice(self):
-        dice_roll = self.prepare_turn()
+        self.prepare_turn()
 
         try:
             self.match.move(Vector2d(1, 6))
@@ -47,3 +47,43 @@ class TestBoard(unittest.TestCase):
         except Exception:
             return
         self.assertTrue(False, 'Moved twice in the same turn')
+
+    def test_trap_skips_turn(self):
+        self.prepare_turn()
+        self.match._current_roll = 6
+
+        self.match.move(Vector2d(6, 6))
+        self.match.next_turn()
+        self.match.next_turn()
+
+        self.assertEqual(self.match.current_turn().nickname, 'user2')
+
+    def test_player_can_move_from_trap_to_trap(self):
+        self.prepare_turn()
+        self.match._current_roll = 6
+
+        self.match.move(Vector2d(6, 6))
+        self.match.next_turn()
+        self.match.next_turn()
+        self.match.next_turn()
+
+        self.match.roll_dice()
+        self.match.move(Vector2d(13, 13))
+
+    def test_player_can_move_after_jumping_traps(self):
+        self.prepare_turn()
+        self.match._current_roll = 6
+
+        self.match.move(Vector2d(6, 6))
+        self.match.next_turn()
+        self.match.next_turn()
+        self.match.next_turn()
+
+        self.match.roll_dice()
+        self.match.move(Vector2d(13, 13))
+
+        self.match.next_turn()
+        self.match.next_turn()
+
+        self.match.roll_dice()
+        self.match.move(Vector2d(14, 13))

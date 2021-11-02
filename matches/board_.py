@@ -1,5 +1,3 @@
-import random
-
 from .square import Square, SquareType
 from typing import List
 from util.vector import Vector2d
@@ -83,7 +81,7 @@ class Board:
 
         self.player_position[player_name] = position
 
-        return self.squares[position.x][position.y].squaretype.name
+        return self.squares[position.x][position.y]
 
     def get_player_position(self, player_name) -> Vector2d:
         return self.player_position[player_name]
@@ -91,3 +89,11 @@ class Board:
     def get_player_square(self, player_name) -> Square:
         p = self.player_position[player_name]
         return self.squares[p.x][p.y]
+
+    def to_dict(self):
+        return {'board': [[str(b2) for b2 in b] for b in self.squares],
+                'player_position': [{'pos_x': v.x, 'pos_y': v.y} for v in self.player_position]}
+
+    def positions_to_dict(self):
+        return {'player_position': [{'pos_x': self.player_position[v].x,
+                                     'pos_y': self.player_position[v].y} for v in self.player_position]}

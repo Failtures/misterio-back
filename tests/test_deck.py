@@ -13,7 +13,7 @@ class TestDeck(unittest.TestCase):
 
         # Since there are six players and 18 cards, each one receives 3 cards
         for i in range(0,6):
-            self.assertEqual(len(match.cards[i][1]), 3)
+            self.assertEqual(len(match.cards[i]), 3)
 
     def test_four_players_match(self):
         match = Match("Test-deck0", ["Player0", "Player1", "Player2", "Player3"])
@@ -24,6 +24,6 @@ class TestDeck(unittest.TestCase):
         # As there are four players and 18 cards, two players receive 5
         # cards and the other two only 4
         for i in range(0,2):
-            self.assertEqual(len(match.cards[i][1]), 5)
+            self.assertEqual(len(match.cards[i]), 5)
         for i in range(2,4):
-            self.assertEqual(len(match.cards[i][1]), 4)    
+            self.assertEqual(len(match.cards[i]), 4)    

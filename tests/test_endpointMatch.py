@@ -69,20 +69,17 @@ class TestMatchEndpoints(TestCaseFastAPI):
             websocket.receive_json()
             websocket.receive_json()
             
-            websocket.send_json({'action': 'match_get_hand', 'player_name': 'host', 'match_name': 'test-use-witch'})
-            websocket.receive_json()
-
             match = matchservice.get_match_by_name("test-use-witch")
             
             # host use salem witch or fail trying
             if match.player_has_witch("host"):
                 websocket.send_json({'action': 'match_use_witch', 'player_name': 'host',
-                                    'match_name': 'test-use-witch', 'card_type': "Monster"})
+                                    'match_name': 'test-use-witch', 'card_type': "MONSTER"})
                 data = websocket.receive_json()
                 self.assertEqual(data['card']['type'], "MONSTER")
             else:
                 websocket.send_json({'action': 'match_use_witch', 'player_name': 'host',
-                                    'match_name': 'test-use-witch', 'card_type': "Monster"})
+                                    'match_name': 'test-use-witch', 'card_type': "MONSTER"})
                 data = websocket.receive_json()
                 self.assertEqual(data['action'], "failed")
 
@@ -99,31 +96,25 @@ class TestMatchEndpoints(TestCaseFastAPI):
             websocket.receive_json()
             websocket.receive_json()
             
-            websocket.send_json({'action': 'match_get_hand', 'player_name': 'host', 'match_name': 'test-use-witch-twice'})
-            websocket.receive_json()
-
             match = matchservice.get_match_by_name("test-use-witch-twice")
             
             if match.player_has_witch("host"):
-                print("Host")
                 websocket.send_json({'action': 'match_use_witch', 'player_name': 'host',
-                                    'match_name': 'test-use-witch-twice', 'card_type': "Monster"})
+                                    'match_name': 'test-use-witch-twice', 'card_type': "MONSTER"})
                 data = websocket.receive_json()
                 self.assertEqual(data['card']['type'], "MONSTER")
 
                 websocket.send_json({'action': 'match_use_witch', 'player_name': 'host',
-                                    'match_name': 'test-use-witch-twice', 'card_type': "Monster"})
+                                    'match_name': 'test-use-witch-twice', 'card_type': "MONSTER"})
                 data = websocket.receive_json()
                 self.assertEqual(data['action'], "failed")    
-            # TODO match.player_has_witch("test-player") doesn't works, idk :D   
-            # elif match.player_has_witch("test-player"):
-            #     print("Other")
-            #     websocket.send_json({'action': 'match_use_witch', 'player_name': 'test-player',
-            #                         'match_name': 'test-use-witch-twice', 'card_type': "Monster"})
-            #     data = websocket.receive_json()
-            #     self.assertEqual(data['card']['type'], "MONSTER")
+            elif match.player_has_witch("test-player"):
+                websocket.send_json({'action': 'match_use_witch', 'player_name': 'test-player',
+                                    'match_name': 'test-use-witch-twice', 'card_type': "MONSTER"})
+                data = websocket.receive_json()
+                self.assertEqual(data['card']['type'], "MONSTER")
 
-            #     websocket.send_json({'action': 'match_use_witch', 'player_name': 'test-player',
-            #                         'match_name': 'test-use-witch-twice', 'card_type': "Monster"})
-            #     data = websocket.receive_json()
-            #     self.assertEqual(data['action'], "failed")
+                websocket.send_json({'action': 'match_use_witch', 'player_name': 'test-player',
+                                    'match_name': 'test-use-witch-twice', 'card_type': "MONSTER"})
+                data = websocket.receive_json()
+                self.assertEqual(data['action'], "failed")

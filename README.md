@@ -42,8 +42,8 @@ Error:
 
 ### Join lobby
 
-Takes: ```{'action': 'lobby_join', 'player_name': str, 
-'lobby_name': str}```
+Takes: 
+```{'action': 'lobby_join', 'player_name': str, 'lobby_name': str}```
 
 Returns:
 
@@ -96,6 +96,18 @@ Returns:
 
 To sender
 ```{'action': 'get_hand', 'hand': [Card]}```
+
+### Use Salem Witch
+
+Description: Allows the player to use the witch of salem, then removes
+
+Takes:
+```{'action': 'match_use_witch', 'player_name': str, 'match_name': str, card_type: CardType}```
+
+Returns:
+
+To sender
+```{'action': 'mystery_card', 'card': Card}```
 
 ### End turn
 

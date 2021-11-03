@@ -3,7 +3,7 @@ from matches.match_service import MatchService
 from matches.match import Match
 from users.user import User
 
-class TestLobbyService(unittest.TestCase):
+class TestMatchService(unittest.TestCase):
 
     def setUp(self) -> None:
         self.match_service = MatchService()

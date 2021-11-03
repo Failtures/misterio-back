@@ -16,8 +16,6 @@ class MatchService:
         deck = Deck(match)
         deck.deal_cards()
 
-        self.matches.append(match)
-        
         return match
 
     def get_matches(self) -> List[Match]:

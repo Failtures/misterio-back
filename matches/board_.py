@@ -26,11 +26,9 @@ class Board:
         self.player_position = {}
 
         # Assign starting positions to players
-        index = 0
         for p in players:
-            self.player_position[p] = Vector2d(self.STARTING_SQUARES[index][0], self.STARTING_SQUARES[index][1])
-            self.STARTING_SQUARES.pop(index)
-            index += 1
+            self.player_position[p] = Vector2d(self.STARTING_SQUARES[0][0], self.STARTING_SQUARES[0][1])
+            self.STARTING_SQUARES.pop(0)
 
         # Init board squares
         for i in range(0, self.WIDTH):

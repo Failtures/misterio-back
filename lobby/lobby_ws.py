@@ -85,7 +85,7 @@ async def lobby_leave(parsedjson, websocket):
         if(leave_player in lobby.players):
             lobby.players.remove(leave_player)
             for lobbyplayer in lobby.players:
-                await lobbyplayer.socket.send_json({'action': 'player_leaved', 'player_name': player})
+                await lobbyplayer.socket.send_json({'action': 'player_left', 'player_name': player})
 
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})

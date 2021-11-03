@@ -97,6 +97,14 @@ Takes: ```{'action': 'lobby_create', 'player_name': str, 'lobby_name': str}```
 Returns:
 ```{'action': 'new_lobby', 'lobby': Lobby}```
 
+### Leave lobby
+
+Takes:
+```{'action': 'lobby_leave', 'player_name': <str>, 'lobby_name': <str>}  ```
+
+Returns:
+```{'action': 'player_left', 'player_name': <str>}```
+
 
 ### Start match
 

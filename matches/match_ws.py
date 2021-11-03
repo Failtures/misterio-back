@@ -60,7 +60,11 @@ async def move(parsedjson, websocket):
 
         for player in match.players:
             await player.socket.send_json({'action': 'player_position',
-                                            'pos_x': new_pos.x, 'pos_y': new_pos.y, 'square': str(square)})
+                                           'pos_x': new_pos.x, 'pos_y': new_pos.y, 'square': str(square)})
+    except Exception as e:
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
+        return
+
 
 async def get_hand(parsedjson, websocket):
     try:

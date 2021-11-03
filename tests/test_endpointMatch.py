@@ -136,3 +136,81 @@ class TestMatchEndpoints(TestCaseFastAPI):
                                 'match_name': 'test-no-player', 'card_type': "MONSTER"})
             data = websocket.receive_json()
             self.assertEqual(data['action'], "failed")
+
+    def test_accuse_victory(self):
+        with self.client.websocket_connect('/ws') as websocket:
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-accuse-victory'})
+            websocket.receive_json()
+            with self.client.websocket_connect('/ws') as websocket2:
+                websocket2.send_json({'action': 'lobby_join', 'player_name': 'test-player-victory', 'lobby_name': 'test-accuse-victory'})
+                websocket2.receive_json()
+                websocket.receive_json()
+                websocket.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-accuse-victory'})
+                websocket.receive_json()
+                websocket2.receive_json()
+
+                match = matchservice.get_match_by_name('test-accuse-victory')
+                turn_player = match.current_turn()
+                mystery = match.mystery
+                if turn_player.nickname == 'host':
+                    websocket.send_json({'action': 'match_accuse', 'match_name': 'test-accuse-victory', 
+                                                    'monster': mystery[0].name, 'victim': mystery[1].name, 'room': mystery[2].name})
+                    data = websocket.receive_json()
+                else: 
+                    websocket2.send_json({'action': 'match_accuse', 'match_name': 'test-accuse-victory', 
+                                                    'monster': mystery[0].name, 'victim': mystery[1].name, 'room': mystery[2].name})
+                    data = websocket2.receive_json()
+                
+                self.assertEqual(data, {'action': 'game_over', 'winner': turn_player.nickname})
+
+    def test_accuse_defead(self):
+        with self.client.websocket_connect('/ws') as websocket:
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-accuse-defeat'})
+            websocket.receive_json()
+            with self.client.websocket_connect('/ws') as websocket2:
+                websocket2.send_json({'action': 'lobby_join', 'player_name': 'test-player-defeat', 'lobby_name': 'test-accuse-defeat'})
+                websocket2.receive_json()
+                websocket.receive_json()
+                websocket.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-accuse-defeat'})
+                websocket.receive_json()
+                websocket2.receive_json()
+
+                match = matchservice.get_match_by_name('test-accuse-defeat')
+                turn_player = match.current_turn()
+                mystery = match.mystery
+                if turn_player.nickname == 'host':
+                    websocket.send_json({'action': 'match_accuse', 'match_name': 'test-accuse-defeat', 
+                                                    'monster': 'ghost', 'victim': 'conde', 'room': 'pantheon'})
+                    data = websocket.receive_json()
+                else: 
+                    websocket2.send_json({'action': 'match_accuse', 'match_name': 'test-accuse-defeat', 
+                                                    'monster': 'ghost', 'victim': 'conde', 'room': 'pantheon'})
+                    data = websocket2.receive_json()
+                
+                self.assertEqual(data, {'action': 'player_deleted', 'loser': turn_player.nickname})
+
+    def test_accuse_no_turn(self):
+        with self.client.websocket_connect('/ws') as websocket:
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-accuse-accuse-no-host'})
+            websocket.receive_json() #Lobby creado correctamente
+            with self.client.websocket_connect('/ws') as websocket2:
+                websocket2.send_json({'action': 'lobby_join', 'player_name': 'test-player-no-turn', 'lobby_name': 'test-accuse-accuse-no-host'})
+                websocket2.receive_json() #Usuario se uno correctamente
+                websocket.receive_json()
+                websocket.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-accuse-accuse-no-host'})
+                websocket.receive_json() #Partida empezada correctamente
+                websocket2.receive_json()
+
+                match = matchservice.get_match_by_name('test-accuse-accuse-no-host')
+                turn_player = match.current_turn()
+                if not turn_player.nickname == 'host':
+                    websocket.send_json({'action': 'match_accuse', 'match_name': 'test-accuse-accuse-no-host', 
+                                                    'monster': 'ghost', 'victim': 'conde', 'room': 'pantheon'})
+
+                    data = websocket.receive_json()
+                else: 
+                    websocket2.send_json({'action': 'match_accuse', 'match_name': 'test-accuse-accuse-no-host', 
+                                                    'monster': 'ghost', 'victim': 'conde', 'room': 'pantheon'})
+                    data = websocket2.receive_json()
+                
+                self.assertEqual(data, {'action': 'failed', 'info': "It's not your turn"})

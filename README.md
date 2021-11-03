@@ -14,7 +14,10 @@
     + [Start match](#start-match)
   * [Match endpoint](#match-endpoint)
     + [Roll dice](#roll-dice)
+    + [Get hand](#get-hand)
+    + [Use Salem Witch](#use-salem-witch)
     + [End turn](#end-turn)
+    + [Move](#move)
 
 
 # Install

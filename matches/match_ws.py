@@ -120,11 +120,10 @@ async def use_salem_witch(parsedjson, websocket):
 async def accuse(parsedjson, websocket):
     try:
         match_name = parsedjson['match_name']
-        print(0)
         match = matchservice.get_match_by_name(match_name)
 
         # Fails if is not the turn of the requesting player
-        if match.current_turn().socket.client.host != websocket.client.host:
+        if match.current_turn().socket != websocket:
             raise Exception ("It's not your turn")
 
         monster = parsedjson['monster']

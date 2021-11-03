@@ -1,12 +1,13 @@
 import unittest
 from matches.entities.deck import Deck
 from matches.match import Match
+from users.user import User
 
 class TestDeck(unittest.TestCase):
 
     def test_six_players_match(self):
-        match = Match("Test-deck0", ["Player0", "Player1", "Player2",
-                                    "Player3", "Player4", "Player5"])
+        match = Match("Test-deck0", [User("Player0"), User("Player1"), User("Player2"),
+                                    User("Player3"), User("Player4"), User("Player5")])
         deck = Deck(match)
 
         deck.deal_cards()
@@ -16,7 +17,7 @@ class TestDeck(unittest.TestCase):
             self.assertEqual(len(match.cards[i]), 3)
 
     def test_four_players_match(self):
-        match = Match("Test-deck0", ["Player0", "Player1", "Player2", "Player3"])
+        match = Match("Test-deck0", [User("Player0"), User("Player1"), User("Player2"), User("Player3")])
         deck = Deck(match)
 
         deck.deal_cards()

@@ -1,4 +1,4 @@
-from extensions import matchservice
+from extensions import matchservice, lobbyservice
 from util.vector import Vector2d
 
 async def match_endpoints(parsedjson, websocket):
@@ -12,6 +12,8 @@ async def match_endpoints(parsedjson, websocket):
         await get_hand(parsedjson, websocket)
     elif parsedjson['action'] == 'match_use_witch':
         await use_salem_witch(parsedjson, websocket)        
+    elif parsedjson['action'] == 'match_accuse':
+        await accuse(parsedjson, websocket)
 
 
 async def end_turn(parsedjson, websocket):
@@ -114,3 +116,32 @@ async def use_salem_witch(parsedjson, websocket):
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
+
+async def accuse(parsedjson, websocket):
+    try:
+        match_name = parsedjson['match_name']
+        print(0)
+        match = matchservice.get_match_by_name(match_name)
+
+        # Fails if is not the turn of the requesting player
+        if match.current_turn().socket.client.host != websocket.client.host:
+            raise Exception ("It's not your turn")
+
+        monster = parsedjson['monster']
+        victim = parsedjson['victim']
+        room = parsedjson['room']
+        
+        if(match.mystery[0].name == monster and match.mystery[1].name == victim and match.mystery[2].name == room):
+            for player in match.players:
+                await player.socket.send_json({'action': 'game_over', 'winner': match.current_turn().nickname})
+            matchservice.delete_match(match)
+            lobby = lobbyservice.get_lobby_by_name(match_name)
+            lobbyservice.delete_lobby(lobby)
+
+        else:
+            for player in match.players:
+                await player.socket.send_json({'action': 'player_deleted', 'loser': match.current_turn().nickname})
+                match.players.remove(match.current_turn())
+
+    except Exception as e:
+        await websocket.send_json({'action': 'failed', 'info': str(e)})

@@ -26,3 +26,7 @@ class MatchService:
 
     def get_player_in_match(self, match: Match, player: str):
         return next(start_player for start_player in match.players if start_player.nickname == player)
+
+    def delete_match(self, match: Match):
+        match.players = []
+        self.matches.remove(match)

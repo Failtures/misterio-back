@@ -18,6 +18,8 @@
     + [Use Salem Witch](#use-salem-witch)
     + [End turn](#end-turn)
     + [Move](#move)
+    + [Accuse] (#accuse)
+    + [Suspect] (#suspect)
 
 
 # Install
@@ -174,3 +176,42 @@ Returns:
 
 To every player in the match
 ```{'action': 'player_position', 'pos_x': <int>, 'pos_y': <int>, 'square': <str>}```
+
+### Accuse
+
+Takes:
+```{'action': 'match_accuse', 'match_name': <str>, 'monster': <str>, 'victim': <str>, 'room': <str>}```
+
+Returns:
+
+To sender
+  + In victory
+  ```{'action': 'game_over', 'winner': <str>}```
+  + In defeat
+  ```{'action': 'player_deleted', 'loser': <str>}```
+
+### Suspect
+
+Takes:
+```{'action': 'match_suspect', 'player_name': <str>, 'match_name': <str>, 'monster': <str>, 'victim': <str>, 'room': <str>}```
+
+Returns:
+
+To next player
+```{'action': 'question', 'monster': <str>, 'victim': <str>, 'room': <str>}```
+
+### Suspect response
+
+Takes:
+  + Affirmative response (when the player has a card)
+  ```{'action': 'match_question_res', 'response': 'affirmative', 'player_name': <str>, 'reply_to': <str>, 'match_name': <str>, 'reply_card': <str>}```
+  + Negative response (when the player hasn't a card)
+  ```{'action': 'match_question_res', 'response': 'negative', 'player_name': <str>, 'reply_to': <str>, 'match_name': <str>, 'reply_card': <str>, 'monster': 'Dracula', 'victim': 'Count', 'room': 'Living'}```
+
+Returns:
+
+If the next player is not the one who made the suspect:
+```{'action': 'question', 'monster': monster, 'victim': victim, 'room': room}```
+
+If the next player is the one who made the suspect:
+```{'action': 'suspect_response', 'card': <str>}```

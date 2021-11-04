@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 from main import app
 from extensions import matchservice
 from tests.working_test_case import TestCaseFastAPI
+from util.vector import Vector2d
 
 
 class TestMatchEndpoints(TestCaseFastAPI):
@@ -192,13 +193,13 @@ class TestMatchEndpoints(TestCaseFastAPI):
     def test_accuse_no_turn(self):
         with self.client.websocket_connect('/ws') as websocket:
             websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-accuse-accuse-no-host'})
-            websocket.receive_json() #Lobby creado correctamente
+            websocket.receive_json()
             with self.client.websocket_connect('/ws') as websocket2:
                 websocket2.send_json({'action': 'lobby_join', 'player_name': 'test-player-no-turn', 'lobby_name': 'test-accuse-accuse-no-host'})
-                websocket2.receive_json() #Usuario se uno correctamente
+                websocket2.receive_json()
                 websocket.receive_json()
                 websocket.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-accuse-accuse-no-host'})
-                websocket.receive_json() #Partida empezada correctamente
+                websocket.receive_json()
                 websocket2.receive_json()
 
                 match = matchservice.get_match_by_name('test-accuse-accuse-no-host')
@@ -214,3 +215,126 @@ class TestMatchEndpoints(TestCaseFastAPI):
                     data = websocket2.receive_json()
                 
                 self.assertEqual(data, {'action': 'failed', 'info': "It's not your turn"})
+
+
+    def test_suspect_no_room(self):
+        with self.client.websocket_connect('/ws') as websocket0:
+            websocket0.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-suspect-no-room'})
+            websocket0.receive_json()
+
+            with self.client.websocket_connect('/ws') as websocket1:
+                websocket1.send_json({'action': 'lobby_join', 'player_name': 'test-player0', 'lobby_name': 'test-suspect-no-room'})
+                websocket0.receive_json()
+                websocket1.receive_json()
+
+                websocket0.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-suspect-no-room'})
+                websocket0.receive_json()
+                websocket1.receive_json()
+
+                match = matchservice.get_match_by_name('test-suspect-no-room')
+
+                if match.players[0].nickname == 'host':
+                    websocket0.send_json({'action': 'match_suspect', 'player_name': 'host', 
+                                        'match_name': 'test-suspect-no-room', 'monster': 'Dracula',
+                                        'victim': 'Count', 'room': 'Bedroom'})
+                    data = websocket0.receive_json()
+                else:
+                    websocket1.send_json({'action': 'match_suspect', 'player_name': 'test-player0', 
+                                        'match_name': 'test-suspect-no-room', 'monster': 'Dracula',
+                                        'victim': 'Count', 'room': 'Bedroom'})
+                    data = websocket1.receive_json()
+
+                self.assertEqual(data, {'action':'failed',
+                                        'info':'You must be in a room to suspect'})
+
+    
+    def test_suspect_neg(self):
+        with self.client.websocket_connect('/ws') as websocket0:
+            websocket0.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-suspect-neg'})
+            websocket0.receive_json()
+
+            with self.client.websocket_connect('/ws') as websocket1:
+                websocket1.send_json({'action': 'lobby_join', 'player_name': 'test-player0', 'lobby_name': 'test-suspect-neg'})
+                websocket0.receive_json()
+                websocket1.receive_json()
+
+                websocket0.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-suspect-neg'})
+                websocket0.receive_json()
+                websocket1.receive_json()
+
+                match = matchservice.get_match_by_name('test-suspect-neg')
+                match._rolled_dice = True
+                match._current_roll = 9
+                match.move(Vector2d(3,6))
+
+                if match.players[0].nickname == 'host':
+                    websocket0.send_json({'action': 'match_suspect', 'player_name': 'host', 
+                                        'match_name': 'test-suspect-neg', 'monster': 'Dracula',
+                                        'victim': 'Count', 'room': 'Living'})
+                    data1 = websocket1.receive_json()
+                    self.assertEqual(data1['action'], 'question')
+
+                    websocket1.send_json({'action': 'match_question_res', 'response': 'negative',
+                                        'player_name': 'test-player0', 'reply_to': 'host',
+                                        'match_name': 'test-suspect-neg', 'monster': 'Dracula',
+                                        'victim': 'Count', 'room': 'Living'})
+
+                    res = websocket0.receive_json()
+                else:
+                    websocket1.send_json({'action': 'match_suspect', 'player_name': 'test-player0', 
+                                        'match_name': 'test-suspect-neg', 'monster': 'Dracula',
+                                        'victim': 'Count', 'room': 'Living'})
+                    data0 = websocket0.receive_json()
+                    self.assertEqual(data0['action'], 'question')
+                    websocket0.send_json({'action': 'match_question_res', 'response': 'negative',
+                                        'player_name': 'host', 'reply_to': 'test-player0',
+                                        'match_name': 'test-suspect-neg', 'monster': 'Dracula',
+                                        'victim': 'Count', 'room': 'Living'})
+                    res = websocket1.receive_json()
+                
+                self.assertEqual(res, {'action': 'suspect_response', 'card': None})
+
+
+    def test_suspect_aff(self):
+        with self.client.websocket_connect('/ws') as websocket0:
+            websocket0.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-suspect-aff'})
+            websocket0.receive_json()
+
+            with self.client.websocket_connect('/ws') as websocket1:
+                websocket1.send_json({'action': 'lobby_join', 'player_name': 'test-player0', 'lobby_name': 'test-suspect-aff'})
+                websocket0.receive_json()
+                websocket1.receive_json()
+
+                websocket0.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-suspect-aff'})
+                websocket0.receive_json()
+                websocket1.receive_json()
+
+                match = matchservice.get_match_by_name('test-suspect-aff')
+                match._rolled_dice = True
+                match._current_roll = 9
+                match.move(Vector2d(3,6))
+
+                if match.players[0].nickname == 'host':
+                    websocket0.send_json({'action': 'match_suspect', 'player_name': 'host', 
+                                        'match_name': 'test-suspect-aff', 'monster': 'Dracula',
+                                        'victim': 'Count', 'room': 'Living'})
+                    data1 = websocket1.receive_json()
+                    self.assertEqual(data1['action'], 'question')
+
+                    websocket1.send_json({'action': 'match_question_res', 'response': 'affirmative',
+                                        'player_name': 'test-player0', 'reply_to': 'host',
+                                        'match_name': 'test-suspect-aff', 'reply_card': 'Dracula'})
+                    res = websocket0.receive_json()
+                else:
+                    websocket1.send_json({'action': 'match_suspect', 'player_name': 'test-player0', 
+                                        'match_name': 'test-suspect-aff', 'monster': 'Dracula',
+                                        'victim': 'Count', 'room': 'Living'})
+                    data0 = websocket0.receive_json()
+                    self.assertEqual(data0['action'], 'question')
+
+                    websocket0.send_json({'action': 'match_question_res', 'response': 'affirmative',
+                                        'player_name': 'host', 'reply_to': 'test-player0',
+                                        'match_name': 'test-suspect-aff', 'reply_card': 'Dracula'})
+                    res = websocket1.receive_json()
+                    
+                self.assertEqual(res, {'action': 'suspect_response', 'card': 'Dracula'})

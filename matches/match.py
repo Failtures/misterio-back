@@ -24,7 +24,7 @@ class Match:
         # Shuffle turn order
         random.shuffle(self.players)
         
-        # self.cards is an array with the tuple (User, List [Cards]) 
+        # self.cards is an array with List[Cards]
         self.cards = []
         # For each player a tuple is created in self.cards
         for players in self.players:

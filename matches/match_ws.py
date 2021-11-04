@@ -24,18 +24,18 @@ async def end_turn(parsedjson, websocket):
     try:
         match_name = parsedjson['match_name']
         match = matchservice.get_match_by_name(match_name)
+
+        # Fails if is not the turn of the requesting player
+        if match.current_turn().socket.client.host != websocket.client.host:
+            await websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
+            return
+        match.next_turn()
+
+        for player in match.players:
+            await player.socket.send_json({'action': 'turn_passed', 'current_turn': match.current_turn().nickname})
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
-
-    # Fails if is not the turn of the requesting player
-    if match.current_turn().socket.client.host != websocket.client.host:
-        await websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
-        return
-    match.next_turn()
-
-    for player in match.players:
-        await player.socket.send_json({'action': 'turn_passed', 'current_turn': match.current_turn().nickname})
 
 
 async def roll_dice(parsedjson, websocket):
@@ -79,18 +79,18 @@ async def get_hand(parsedjson, websocket):
         player_name = parsedjson['player_name']
         player = matchservice.get_player_in_match(match, player_name)
         hand = match.get_hand(player_name)
+
+        if websocket.client.host != player.socket.client.host:
+            await websocket.client.socket.send_json(
+                {'action': 'failed', 'info': "You are not ${player.nickname}"})
+
+        for i in range(0, len(hand)):
+            hand[i] = hand[i].to_dict()
+
+        await player.socket.send_json({'action': 'get_hand', 'hand': hand})
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
-
-    if websocket.client.host != player.socket.client.host:
-        await websocket.client.socket.send_json(
-            {'action': 'failed', 'info': "You are not ${player.nickname}"})
-
-    for i in range(0, len(hand)):
-        hand[i] = hand[i].to_dict()
-
-    await player.socket.send_json({'action': 'get_hand', 'hand': hand})
     
 
 async def use_salem_witch(parsedjson, websocket):
@@ -120,6 +120,7 @@ async def use_salem_witch(parsedjson, websocket):
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
+
 
 async def accuse(parsedjson, websocket):
     try:
@@ -156,33 +157,34 @@ async def suspect(parsedjson, websocket):
         match = matchservice.get_match_by_name(match_name)
         player_name = parsedjson['player_name']
         player = matchservice.get_player_in_match(match, player_name)
+
+        if match.current_turn().socket.client.host != websocket.client.host:
+            websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
+            return
+
+        if (str(match.board.get_player_square(player_name)) == 'None' or
+                str(match.board.get_player_square(player_name)) == 'Regular' or
+                str(match.board.get_player_square(player_name)) == 'Animal' or
+                str(match.board.get_player_square(player_name)) == 'Trap'):
+            await player.socket.send_json({'action': 'failed', 'info': 'You must be in a room to suspect'})
+        room = str(match.board.get_player_square(player_name))
+        if room != parsedjson['room'].lower().title():
+            await player.socket.send_json(
+                {'action': 'failed', 'info': f"You are not in ${parsedjson['room'].lower().title()}"})
+            return
+
+        monster = parsedjson['monster'].lower().title()
+        victim = parsedjson['victim'].lower().title()
+
+        for i in range(0, len(match.players)):
+            if match.players[i] == player:
+                player_turn = i
+
+        await match.players[(player_turn + 1) % len(match.players)].socket.send_json(
+            {'action': 'question', 'monster': monster, 'victim': victim, 'room': room})
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
-
-    if match.current_turn().socket.client.host != websocket.client.host:
-        websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
-        return
-
-    if (str(match.board.get_player_square(player_name)) == 'None' or
-        str(match.board.get_player_square(player_name)) == 'Regular' or
-        str(match.board.get_player_square(player_name)) == 'Animal' or
-        str(match.board.get_player_square(player_name)) == 'Trap'):
-        await player.socket.send_json({'action': 'failed', 'info': 'You must be in a room to suspect'})
-    room = str(match.board.get_player_square(player_name))
-    if room != parsedjson['room'].lower().title():
-        await player.socket.send_json({'action': 'failed', 'info': f"You are not in ${parsedjson['room'].lower().title()}"})
-        return
-
-    monster = parsedjson['monster'].lower().title()
-    victim = parsedjson['victim'].lower().title()
-
-    for i in range(0, len(match.players)):
-        if match.players[i] == player:
-            player_turn = i
-
-    await match.players[(player_turn+1)%len(match.players)].socket.send_json(
-        {'action': 'question', 'monster': monster, 'victim': victim, 'room': room})
 
 
 async def suspect_response(parsedjson, websocket):
@@ -193,26 +195,26 @@ async def suspect_response(parsedjson, websocket):
         player = matchservice.get_player_in_match(match, player_name)
         reply_to = parsedjson['reply_to']
         reply_to_player = matchservice.get_player_in_match(match, reply_to)
+
+        for i in range(0, len(match.players)):
+            if match.players[i] == player:
+                player_turn = i
+
+        if parsedjson['response'] == 'negative':
+            if match.players[(player_turn + 1) % len(match.players)] == reply_to_player:
+                await reply_to_player.socket.send_json({'action': 'suspect_response', 'card': None})
+            else:
+                room = str(match.get_player_square(player_name))
+                monster = parsedjson['monster'].lower().title()
+                victim = parsedjson['victim'].lower().title()
+
+                await match.players[(player_turn + 1) % len(match.players)].socket.send_json(
+                    {'action': 'question', 'monster': monster, 'victim': victim, 'room': room})
+        elif parsedjson['response'] == 'affirmative':
+            reply_card = parsedjson['reply_card']
+
+            await reply_to_player.socket.send_json(
+                {'action': 'suspect_response', 'card': reply_card})
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
-
-    for i in range(0, len(match.players)):
-        if match.players[i] == player:
-            player_turn = i
-    
-    if parsedjson['response'] == 'negative':
-        if match.players[(player_turn+1)%len(match.players)] == reply_to_player:
-            await reply_to_player.socket.send_json({'action': 'suspect_response', 'card': None})
-        else:
-            room = str(match.get_player_square(player_name))
-            monster = parsedjson['monster'].lower().title()
-            victim = parsedjson['victim'].lower().title()
-
-            await match.players[(player_turn+1)%len(match.players)].socket.send_json(
-                {'action': 'question', 'monster': monster, 'victim': victim, 'room': room})                
-    elif parsedjson['response'] == 'affirmative':
-        reply_card = parsedjson['reply_card']
-
-        await reply_to_player.socket.send_json(
-                {'action': 'suspect_response', 'card': reply_card})

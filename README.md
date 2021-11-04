@@ -18,8 +18,8 @@
     + [Use Salem Witch](#use-salem-witch)
     + [End turn](#end-turn)
     + [Move](#move)
-    + [Accuse] (#accuse)
-    + [Suspect] (#suspect)
+    + [Accuse](#accuse)
+    + [Suspect](#suspect)
 
 
 # Install
@@ -206,7 +206,7 @@ Takes:
   + Affirmative response (when the player has a card)
   ```{'action': 'match_question_res', 'response': 'affirmative', 'player_name': <str>, 'reply_to': <str>, 'match_name': <str>, 'reply_card': <str>}```
   + Negative response (when the player hasn't a card)
-  ```{'action': 'match_question_res', 'response': 'negative', 'player_name': <str>, 'reply_to': <str>, 'match_name': <str>, 'reply_card': <str>, 'monster': 'Dracula', 'victim': 'Count', 'room': 'Living'}```
+  ```{'action': 'match_question_res', 'response': 'negative', 'player_name': <str>, 'reply_to': <str>, 'match_name': <str>, 'reply_card': <str>, 'monster': <str>, 'victim': <str>, 'room': <str>'}```
 
 Returns:
 

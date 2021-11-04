@@ -130,9 +130,9 @@ async def accuse(parsedjson, websocket):
         if match.current_turn().socket != websocket:
             raise Exception ("It's not your turn")
 
-        monster = parsedjson['monster']
-        victim = parsedjson['victim']
-        room = parsedjson['room']
+        monster = parsedjson['monster'].lower().title()
+        victim = parsedjson['victim'].lower().title()
+        room = parsedjson['room'].lower().title()
         
         if(match.mystery[0].name == monster and match.mystery[1].name == victim and match.mystery[2].name == room):
             for player in match.players:
@@ -170,12 +170,12 @@ async def suspect(parsedjson, websocket):
         str(match.board.get_player_square(player_name)) == 'Trap'):
         await player.socket.send_json({'action': 'failed', 'info': 'You must be in a room to suspect'})
     room = str(match.board.get_player_square(player_name))
-    if room != parsedjson['room']:
-        await player.socket.send_json({'action': 'failed', 'info': f"You are not in ${parsedjson['room']}"})
+    if room != parsedjson['room'].lower().title():
+        await player.socket.send_json({'action': 'failed', 'info': f"You are not in ${parsedjson['room'].lower().title()}"})
         return
 
-    monster = parsedjson['monster']
-    victim = parsedjson['victim']
+    monster = parsedjson['monster'].lower().title()
+    victim = parsedjson['victim'].lower().title()
 
     for i in range(0, len(match.players)):
         if match.players[i] == player:
@@ -206,8 +206,8 @@ async def suspect_response(parsedjson, websocket):
             await reply_to_player.socket.send_json({'action': 'suspect_response', 'card': None})
         else:
             room = str(match.get_player_square(player_name))
-            monster = parsedjson['monster']
-            victim = parsedjson['victim']
+            monster = parsedjson['monster'].lower().title()
+            victim = parsedjson['victim'].lower().title()
 
             await match.players[(player_turn+1)%len(match.players)].socket.send_json(
                 {'action': 'question', 'monster': monster, 'victim': victim, 'room': room})                

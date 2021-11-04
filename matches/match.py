@@ -72,14 +72,15 @@ class Match:
                 'player_position': self.board.positions_to_dict()}
 
     def move(self, position: Vector2d) -> Square:
-        prev_square = self.board.get_player_square(self.current_turn().nickname)
+        player = self.current_turn().nickname
+
+        prev_square = self.board.get_player_square(player)
 
         if not self._rolled_dice:
             raise Exception('You must roll the dice before moving')
-        if self._moved:
-            raise Exception("You can't move twice in the same turn")
 
-        square = self.board.move_player(position, self.current_turn().nickname, self._current_roll)
+        self._current_roll = self.board.move_player(position, player, self._current_roll)
+        square = self.board.get_player_square(player)
         self._moved = True
 
         if square.squaretype == SquareType.TRAP and prev_square.squaretype != SquareType.TRAP:

@@ -44,15 +44,20 @@ class TestBoard(unittest.TestCase):
             return
         self.assertTrue(False, 'Player moved more than 6 spaces')
 
-    def test_cannot_move_twice(self):
+    def test_can_move_multiple_times_in_the_same_turn(self):
         self.prepare_turn()
+        self.match._current_roll = 6
 
         try:
             self.match.move(Vector2d(1, 6))
             self.match.move(Vector2d(2, 6))
+            self.match.move(Vector2d(3, 6))
+            self.match.move(Vector2d(4, 6))
+            self.match.move(Vector2d(5, 6))
+            self.match.move(Vector2d(6, 6))
+            self.match.next_turn()
         except Exception:
-            return
-        self.assertTrue(False, 'Moved twice in the same turn')
+            self.assertTrue(False, 'Couldnt move multiple times in the same turn')
 
     def test_trap_skips_turn(self):
         self.prepare_turn()
@@ -124,3 +129,20 @@ class TestBoard(unittest.TestCase):
             self.assertTrue(False, 'Player moved without rolling the dice')
         except:
             pass
+
+    def test_player_cant_move_more_than_roll(self):
+        self.prepare_turn()
+        self.match._current_roll = 6
+
+        try:
+            self.match.move(Vector2d(1, 6))
+            self.match.move(Vector2d(2, 6))
+            self.match.move(Vector2d(3, 6))
+            self.match.move(Vector2d(4, 6))
+            self.match.move(Vector2d(5, 6))
+            self.match.move(Vector2d(6, 6))
+            self.match.move(Vector2d(7, 6))
+            self.match.next_turn()
+        except Exception:
+            return
+        self.assertTrue(False, 'Player moved more than 6 times with a roll of 6')

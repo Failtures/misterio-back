@@ -13,6 +13,11 @@ class Vector2d:
         dist2 = abs(self.y - other.y)
         return dist1 + dist2
 
+    def add(self, x = 0, y = 0):
+        self.x += x
+        self.y += y
+        return self
+
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 

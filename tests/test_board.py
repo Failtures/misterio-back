@@ -93,3 +93,34 @@ class TestBoard(unittest.TestCase):
 
         self.match.roll_dice()
         self.match.move(Vector2d(14, 13))
+
+    def test_cant_end_turn_if_not_moved(self):
+
+        self.prepare_turn()
+
+        try:
+            self.match.roll_dice()
+            self.match.next_turn()
+            self.assertTrue(False, 'Player ended turn without moving')
+        except:
+            pass
+
+    def test_cant_end_turn_if_not_rolled_dice_and_moved(self):
+
+        self.prepare_turn()
+
+        try:
+            self.match.next_turn()
+            self.assertTrue(False, 'Player ended turn without rolling the dice and moving')
+        except:
+            pass
+
+    def test_cant_move_if_not_rolled_dice(self):
+
+        self.prepare_turn()
+
+        try:
+            self.match.next_turn()
+            self.assertTrue(False, 'Player moved without rolling the dice')
+        except:
+            pass

@@ -14,6 +14,10 @@ async def match_endpoints(parsedjson, websocket):
         await use_salem_witch(parsedjson, websocket)        
     elif parsedjson['action'] == 'match_accuse':
         await accuse(parsedjson, websocket)
+    elif parsedjson['action'] == 'match_suspect':
+        await suspect(parsedjson, websocket)
+    elif parsedjson['action'] == 'match_question_res':
+        await suspect_response(parsedjson, websocket)
 
 
 async def end_turn(parsedjson, websocket):
@@ -144,3 +148,80 @@ async def accuse(parsedjson, websocket):
 
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
+
+
+async def suspect(parsedjson, websocket):
+    try:
+        match_name = parsedjson['match_name']
+        match = matchservice.get_match_by_name(match_name)
+        player_name = parsedjson['player_name']
+        player = matchservice.get_player_in_match(match, player_name)
+    except Exception as e:
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
+        return
+
+    if match.current_turn().socket.client.host != websocket.client.host:
+        websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
+        return
+
+    # WARNING: Don't document this, use only in tests
+    if parsedjson['room'] == 'UseOnlyForTest':
+            room = 'Bedroom'
+    else:
+        if (str(match.board.get_player_square(player_name)) == 'None' or
+            str(match.board.get_player_square(player_name)) == 'Regular' or
+            str(match.board.get_player_square(player_name)) == 'Animal' or
+            str(match.board.get_player_square(player_name)) == 'Trap'):
+            await player.socket.send_json({'action': 'failed', 'info': 'You must be in a room to suspect'})
+        
+        room = str(match.board.get_player_square(player_name))
+        if room != parsedjson['room']:
+            await player.socket.send_json({'action': 'failed', 'info': f"You are not in ${parsedjson['room']}"})
+            return
+
+    monster = parsedjson['monster']
+    victim = parsedjson['victim']
+
+    for i in range(0, len(match.players)):
+        if match.players[i] == player:
+            player_turn = i
+
+    await match.players[(player_turn+1)%len(match.players)].socket.send_json(
+        {'action': 'question', 'monster': monster, 'victim': victim, 'room': room})
+
+
+async def suspect_response(parsedjson, websocket):
+    try:
+        match_name = parsedjson['match_name']
+        match = matchservice.get_match_by_name(match_name)
+        player_name = parsedjson['player_name']
+        player = matchservice.get_player_in_match(match, player_name)
+        reply_to = parsedjson['reply_to']
+        reply_to_player = matchservice.get_player_in_match(match, reply_to)
+    except Exception as e:
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
+        return
+
+    for i in range(0, len(match.players)):
+        if match.players[i] == player:
+            player_turn = i
+    
+    if parsedjson['response'] == 'negative':
+        if match.players[(player_turn+1)%len(match.players)] == reply_to_player:
+            await reply_to_player.socket.send_json({'action': 'reply_suspect', 'card': None})
+        else:
+            # WARNING: Don't document this, use only in tests
+            if parsedjson['room'] == 'UseOnlyForTest':
+                room = 'Bedroom'
+            else:
+                room = str(match.get_player_square(player_name))
+            monster = parsedjson['monster']
+            victim = parsedjson['victim']
+
+            await match.players[(player_turn+1)%len(match.players)].socket.send_json(
+                {'action': 'question', 'monster': monster, 'victim': victim, 'room': room})                
+    elif parsedjson['response'] == 'affirmative':
+        reply_card = parsedjson['reply_card']
+
+        await reply_to_player.socket.send_json(
+                {'action': 'reply_suspect', 'card': reply_card})

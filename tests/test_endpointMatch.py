@@ -27,14 +27,28 @@ class TestMatchEndpoints(TestCaseFastAPI):
             for i in range(5):
                 match = matchservice.get_match_by_name('test-end-turn')
                 if(match.current_turn().nickname == 'host'):
+                    websocket.send_json({'action': 'match_roll_dice', 'match_name': 'test-end-turn'})
+                    websocket.send_json({'action': 'match_move', 'match_name': 'test-end-turn', 'pos_x': 1, 'pos_y': 6})
                     websocket.send_json({'action': 'match_end_turn', 'match_name': 'test-end-turn'})
-                    data = websocket.receive_json()
                     websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+
+                    data = websocket.receive_json()
                     self.assertEqual(data, {'action': 'turn_passed', 'current_turn': 'test-player'})
-                else: 
+                else:
+                    websocket.send_json({'action': 'match_roll_dice', 'match_name': 'test-end-turn'})
+                    websocket.send_json({'action': 'match_move', 'match_name': 'test-end-turn', 'pos_x': 6, 'pos_y': 1})
                     websocket.send_json({'action': 'match_end_turn', 'match_name': 'test-end-turn'})
-                    data = websocket.receive_json()
+
                     websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    data = websocket.receive_json()
                     self.assertEqual(data, {'action': 'turn_passed', 'current_turn': 'host'})
 
     def test_get_hand(self):
@@ -164,7 +178,7 @@ class TestMatchEndpoints(TestCaseFastAPI):
                 
                 self.assertEqual(data, {'action': 'game_over', 'winner': turn_player.nickname})
 
-    def test_accuse_defead(self):
+    def test_accuse_defeat(self):
         with self.client.websocket_connect('/ws') as websocket:
             websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-accuse-defeat'})
             websocket.receive_json()
@@ -216,7 +230,6 @@ class TestMatchEndpoints(TestCaseFastAPI):
                 
                 self.assertEqual(data, {'action': 'failed', 'info': "It's not your turn"})
 
-
     def test_suspect_no_room(self):
         with self.client.websocket_connect('/ws') as websocket0:
             websocket0.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-suspect-no-room'})
@@ -246,7 +259,6 @@ class TestMatchEndpoints(TestCaseFastAPI):
 
                 self.assertEqual(data, {'action':'failed',
                                         'info':'You must be in a room to suspect'})
-
     
     def test_suspect_neg(self):
         with self.client.websocket_connect('/ws') as websocket0:
@@ -293,7 +305,6 @@ class TestMatchEndpoints(TestCaseFastAPI):
                     res = websocket1.receive_json()
                 
                 self.assertEqual(res, {'action': 'suspect_response', 'card': None})
-
 
     def test_suspect_aff(self):
         with self.client.websocket_connect('/ws') as websocket0:

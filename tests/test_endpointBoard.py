@@ -6,6 +6,7 @@ from main import app
 class TestEndpointBoard(TestCaseFastAPI):
 
     def setUp(self) -> None:
+        from extensions import matchservice;matchservice.matches = []
         self.client = TestClient(app)
 
     def test_move(self):
@@ -23,10 +24,10 @@ class TestEndpointBoard(TestCaseFastAPI):
                 turn = websocket.receive_json()
 
                 if turn['match']['turn'] == 'player2':
+                    websocket2.send_json({'action': 'match_roll_dice', 'match_name': 'lobby'})
+                    websocket2.send_json({'action': 'match_move', 'match_name': 'lobby', 'pos_x': 6, 'pos_y': 1})
                     websocket2.send_json({'action': 'match_end_turn', 'player_name': 'host', 'match_name': 'lobby'})
-                    websocket2.receive_json()
                     resp = websocket2.receive_json()
-                    websocket.receive_json()
 
                 websocket.send_json({'action': 'match_roll_dice', 'match_name': 'lobby'})
                 dice = websocket.receive_json()
@@ -34,4 +35,5 @@ class TestEndpointBoard(TestCaseFastAPI):
                 websocket.send_json({'action': 'match_move', 'match_name': 'lobby', 'pos_x': 1, 'pos_y': 6})
                 json = websocket.receive_json()
 
+                print(json)
                 self.assertEqual(json['square'], 'Regular')

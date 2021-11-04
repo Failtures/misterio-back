@@ -33,11 +33,13 @@ class Match:
         # self.mystery represents the envelope, will be a tuple (Card, Card, Card)
         self.mystery = None
 
-
     def __eq__(self, other):
         return self.name == other.name
 
     def next_turn(self) -> User:
+        if not self._rolled_dice or not self._moved:
+            raise Exception("You must roll the dice and move before ending your turn")
+
         # Reset flags
         self._rolled_dice = False
         self._moved = False
@@ -70,21 +72,21 @@ class Match:
                 'player_position': self.board.positions_to_dict()}
 
     def move(self, position: Vector2d) -> Square:
-        prev_square = self.board.get_player_square(self.current_turn().nickname)
+        player = self.current_turn().nickname
+
+        prev_square = self.board.get_player_square(player)
 
         if not self._rolled_dice:
             raise Exception('You must roll the dice before moving')
-        if self._moved:
-            raise Exception("You can't move twice in the same turn")
 
-        square = self.board.move_player(position, self.current_turn().nickname, self._current_roll)
+        self._current_roll = self.board.move_player(position, player, self._current_roll)
+        square = self.board.get_player_square(player)
         self._moved = True
 
         if square.squaretype == SquareType.TRAP and prev_square.squaretype != SquareType.TRAP:
             self.trapped.append(self.current_turn())
 
         return square
-
 
     def get_hand(self, player: str) -> List[Card]:
         for i in range(0, len(self.players)):

@@ -79,7 +79,7 @@ class Board:
 
         self.player_position[player_name] = position
 
-        return self.squares[position.x][position.y]
+        return moves - required_moves
 
     def get_player_position(self, player_name) -> Vector2d:
         return self.player_position[player_name]

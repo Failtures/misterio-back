@@ -42,18 +42,18 @@ async def roll_dice(parsedjson, websocket):
     try:
         match_name = parsedjson['match_name']
         match = matchservice.get_match_by_name(match_name)
+
+        # Fails if is not the turn of the requesting player
+        if match.current_turn().socket.client.host != websocket.client.host:
+            websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
+            return
+        dice = match.roll_dice()
+
+        for player in match.players:
+            await player.socket.send_json({'action': 'roll_dice', 'dice': dice})
     except Exception as e:
-        websocket.send_json({'action': 'failed', 'info': str(e)})
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
-
-    # Fails if is not the turn of the requesting player
-    if match.current_turn().socket.client.host != websocket.client.host:
-        websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
-        return
-    dice = match.roll_dice()
-
-    for player in match.players:
-        await player.socket.send_json({'action': 'roll_dice', 'dice': dice})
 
 
 async def move(parsedjson, websocket):

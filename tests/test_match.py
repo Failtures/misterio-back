@@ -10,9 +10,14 @@ class TestMatch2Players(unittest.TestCase):
 
     def test_correct_turns(self):
         turns = self.match.players
+
+        self.match.roll_dice()
+        self.match.move(self.match.board.get_player_position(turns[0].nickname))
         self.assertTrue(turns[1] == self.match.next_turn(),
             "The next turn doesn't belong to the correct user")
 
+        self.match.roll_dice()
+        self.match.move(self.match.board.get_player_position(turns[1].nickname))
         self.assertTrue(turns[0] == self.match.next_turn(),
             "The next turn doesn't belong to the correct user")
 
@@ -28,16 +33,28 @@ class TestMatch6Players(unittest.TestCase):
 
     def test_correct_turns(self):
         turns = self.match.players
+        self.match.roll_dice()
+        self.match.move(self.match.board.get_player_position(turns[0].nickname))
         self.assertTrue(turns[1] == self.match.next_turn(),
             "The next turn doesn't belong to the correct user")
+        self.match.roll_dice()
+        self.match.move(self.match.board.get_player_position(turns[1].nickname))
         self.assertTrue(turns[2] == self.match.next_turn(),
             "The next turn doesn't belong to the correct user")
+        self.match.roll_dice()
+        self.match.move(self.match.board.get_player_position(turns[2].nickname))
         self.assertTrue(turns[3] == self.match.next_turn(),
             "The next turn doesn't belong to the correct user")
+        self.match.roll_dice()
+        self.match.move(self.match.board.get_player_position(turns[3].nickname))
         self.assertTrue(turns[4] == self.match.next_turn(),
             "The next turn doesn't belong to the correct user")
+        self.match.roll_dice()
+        self.match.move(self.match.board.get_player_position(turns[4].nickname))
         self.assertTrue(turns[5] == self.match.next_turn(),
             "The next turn doesn't belong to the correct user")
+        self.match.roll_dice()
+        self.match.move(self.match.board.get_player_position(turns[5].nickname))
         self.assertTrue(turns[0] == self.match.next_turn(),
             "The next turn doesn't belong to the correct user")
 

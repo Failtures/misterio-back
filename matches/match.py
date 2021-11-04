@@ -33,11 +33,13 @@ class Match:
         # self.mystery represents the envelope, will be a tuple (Card, Card, Card)
         self.mystery = None
 
-
     def __eq__(self, other):
         return self.name == other.name
 
     def next_turn(self) -> User:
+        if not self._rolled_dice or not self._moved:
+            raise Exception("You must roll the dice and move before ending your turn")
+
         # Reset flags
         self._rolled_dice = False
         self._moved = False
@@ -84,7 +86,6 @@ class Match:
             self.trapped.append(self.current_turn())
 
         return square
-
 
     def get_hand(self, player: str) -> List[Card]:
         for i in range(0, len(self.players)):

@@ -14,10 +14,16 @@ class TestBoard(unittest.TestCase):
         current_turn = self.match.current_turn()
 
         if current_turn.nickname != 'user1':
+            self.match.move(self.match.board.get_player_position("user2"))
             self.match.next_turn()
             dice_value = self.match.roll_dice()
 
         return dice_value
+
+    def skip_turn(self):
+        self.match.roll_dice()
+        self.match.move(self.match.board.get_player_position(self.match.current_turn().nickname))
+        self.match.next_turn()
 
     def test_moves_right_distance(self):
         dice_value = self.prepare_turn()
@@ -54,7 +60,7 @@ class TestBoard(unittest.TestCase):
 
         self.match.move(Vector2d(6, 6))
         self.match.next_turn()
-        self.match.next_turn()
+        self.skip_turn()
 
         self.assertEqual(self.match.current_turn().nickname, 'user2')
 
@@ -64,8 +70,8 @@ class TestBoard(unittest.TestCase):
 
         self.match.move(Vector2d(6, 6))
         self.match.next_turn()
-        self.match.next_turn()
-        self.match.next_turn()
+        self.skip_turn()
+        self.skip_turn()
 
         self.match.roll_dice()
         self.match.move(Vector2d(13, 13))
@@ -76,14 +82,14 @@ class TestBoard(unittest.TestCase):
 
         self.match.move(Vector2d(6, 6))
         self.match.next_turn()
-        self.match.next_turn()
-        self.match.next_turn()
+        self.skip_turn()
+        self.skip_turn()
 
         self.match.roll_dice()
         self.match.move(Vector2d(13, 13))
 
         self.match.next_turn()
-        self.match.next_turn()
+        self.skip_turn()
 
         self.match.roll_dice()
         self.match.move(Vector2d(14, 13))

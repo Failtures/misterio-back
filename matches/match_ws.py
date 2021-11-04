@@ -164,20 +164,15 @@ async def suspect(parsedjson, websocket):
         websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
         return
 
-    # WARNING: Don't document this, use only in tests
-    if parsedjson['room'] == 'UseOnlyForTest':
-            room = 'Bedroom'
-    else:
-        if (str(match.board.get_player_square(player_name)) == 'None' or
-            str(match.board.get_player_square(player_name)) == 'Regular' or
-            str(match.board.get_player_square(player_name)) == 'Animal' or
-            str(match.board.get_player_square(player_name)) == 'Trap'):
-            await player.socket.send_json({'action': 'failed', 'info': 'You must be in a room to suspect'})
-        
-        room = str(match.board.get_player_square(player_name))
-        if room != parsedjson['room']:
-            await player.socket.send_json({'action': 'failed', 'info': f"You are not in ${parsedjson['room']}"})
-            return
+    if (str(match.board.get_player_square(player_name)) == 'None' or
+        str(match.board.get_player_square(player_name)) == 'Regular' or
+        str(match.board.get_player_square(player_name)) == 'Animal' or
+        str(match.board.get_player_square(player_name)) == 'Trap'):
+        await player.socket.send_json({'action': 'failed', 'info': 'You must be in a room to suspect'})
+    room = str(match.board.get_player_square(player_name))
+    if room != parsedjson['room']:
+        await player.socket.send_json({'action': 'failed', 'info': f"You are not in ${parsedjson['room']}"})
+        return
 
     monster = parsedjson['monster']
     victim = parsedjson['victim']
@@ -208,13 +203,9 @@ async def suspect_response(parsedjson, websocket):
     
     if parsedjson['response'] == 'negative':
         if match.players[(player_turn+1)%len(match.players)] == reply_to_player:
-            await reply_to_player.socket.send_json({'action': 'reply_suspect', 'card': None})
+            await reply_to_player.socket.send_json({'action': 'suspect_response', 'card': None})
         else:
-            # WARNING: Don't document this, use only in tests
-            if parsedjson['room'] == 'UseOnlyForTest':
-                room = 'Bedroom'
-            else:
-                room = str(match.get_player_square(player_name))
+            room = str(match.get_player_square(player_name))
             monster = parsedjson['monster']
             victim = parsedjson['victim']
 
@@ -224,4 +215,4 @@ async def suspect_response(parsedjson, websocket):
         reply_card = parsedjson['reply_card']
 
         await reply_to_player.socket.send_json(
-                {'action': 'reply_suspect', 'card': reply_card})
+                {'action': 'suspect_response', 'card': reply_card})

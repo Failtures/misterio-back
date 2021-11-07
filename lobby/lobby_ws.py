@@ -79,7 +79,8 @@ async def lobby_leave(parsedjson, websocket):
         # If the person who want to leave the lobby is the host: any player is removed and the lobby is deleted.
         if(lobby.is_host(leave_player)):
             for lobbyplayer in lobby.players:
-                await lobbyplayer.send_json({'action': 'lobby_removed', 'lobby_name': lobby.name})
+                print(lobbyplayer.nickname)
+                await lobbyplayer.socket.send_json({'action': 'lobby_removed', 'lobby_name': lobby.name})
             lobbyservice.delete_lobby(lobby)
             
         # If a non-host player want to leave the lobby: It's removed and the other players are notificed.

@@ -196,13 +196,13 @@ class TestMatchEndpoints(TestCaseFastAPI):
                 if turn_player.nickname == 'host':
                     websocket.send_json({'action': 'match_accuse', 'match_name': 'test-accuse-defeat', 
                                                     'monster': 'ghost', 'victim': 'conde', 'room': 'pantheon'})
-                    data = websocket.receive_json()
                 else: 
                     websocket2.send_json({'action': 'match_accuse', 'match_name': 'test-accuse-defeat', 
                                                     'monster': 'ghost', 'victim': 'conde', 'room': 'pantheon'})
-                    data = websocket2.receive_json()
-                
+                data = websocket.receive_json()
+                data2 = websocket2.receive_json()
                 self.assertEqual(data, {'action': 'player_deleted', 'loser': turn_player.nickname})
+                self.assertEqual(data2, {'action': 'player_deleted', 'loser': turn_player.nickname})
 
     def test_accuse_no_turn(self):
         with self.client.websocket_connect('/ws') as websocket:

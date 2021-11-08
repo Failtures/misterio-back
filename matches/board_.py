@@ -94,4 +94,5 @@ class Board:
 
     def positions_to_dict(self):
         return {'player_position': [{'pos_x': self.player_position[v].x,
-                                     'pos_y': self.player_position[v].y} for v in self.player_position]}
+                                     'pos_y': self.player_position[v].y,
+                                     'player_name': v} for v in self.player_position]}

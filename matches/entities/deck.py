@@ -10,7 +10,7 @@ class Deck:
         # Define the deck
         self.cards = [
             Card("Monster", "Dracula"), Card("Monster", "Frankenstein"), Card("Monster", "Werewolf"),
-            Card("Monster", "Ghost"), Card("Monster", "Mummy"), Card("Monster", "Dr. Jekyll and Mr Hyde"),
+            Card("Monster", "Ghost"), Card("Monster", "Mummy"), Card("Monster", "Dr. Jekyll And Mr Hyde"),
             Card("Victim", "Count"), Card("Victim", "Countess"), Card("Victim", "Housekeeper"),
             Card("Victim", "Butler"), Card("Victim", "Maid"), Card("Victim", "Gardener"),
             Card("Room", "Bedroom"), Card("Room", "Library"), Card("Room", "Cellar"),

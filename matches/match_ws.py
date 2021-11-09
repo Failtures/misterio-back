@@ -146,7 +146,6 @@ async def accuse(parsedjson, websocket):
             for player in match.players:
                 await player.socket.send_json({'action': 'player_deleted', 'loser': match.current_turn().nickname})
             match.players.remove(match.current_turn())
-            match.next_turn()
 
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})

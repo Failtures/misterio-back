@@ -63,7 +63,7 @@ Lobby:
 
 
 Match:
-```{'name': self.name, 'players': [str], 'turn': str, 'player_positions': {'player_name': {'pos_x': <int>, 'pos_y': <int>}}}```
+```{'name': self.name, 'players': [str], 'turn': str, 'player_positions': [{pos_x: <int>, pos_y: <int>, player_name: <string>}]}```
 
 Card:
 ```{'type': CardType, 'name': str}```

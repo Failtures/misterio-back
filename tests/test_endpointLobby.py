@@ -31,23 +31,6 @@ class TestLobbyEndpoints(TestCaseFastAPI):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(len(lobbies), 7)
 
-
-    def test_create_lobby_duplicate(self):
-        with self.client.websocket_connect('/ws') as websocket:
-            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'duplicate-lobby'})
-            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'duplicate-lobby'})
-            websocket.receive_json()
-            data = websocket.receive_json()
-            self.assertEqual(data,{'action': 'failed', 'info': 'Duplicate lobby name'})   
-
-    def test_get_lobbies(self):
-        self.create_dummy_lobbies(5)
-        res = self.client.get('/get-lobbies')
-        lobbies = res.json()['lobbies']
-
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(len(lobbies), 6)
-
     def test_join_lobby_full(self):
         with self.client.websocket_connect('/ws') as websocket:
             websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'lobby-full'})

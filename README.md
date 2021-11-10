@@ -8,6 +8,7 @@
 - [Board organization](#board-organization)
 - [Websockets protocol](#websockets-protocol)
   * [Definitions](#definitions)
+  * [Chat endpoint](#chat-endpoint)
   * [Lobby endpoint](#lobby-endpoint)
     + [Join lobby](#join-lobby)
     + [Create lobby](#create-lobby)
@@ -75,6 +76,23 @@ Error:
 ```{'action': 'failed', 'info': str}```
 * All endpoints return Error if there was one
 
+## Chat endpoint
+
+### Send message
+
+*chat_name* is the lobby/match name
+
+Takes (in lobby):
+```{'action': 'chat_lobby_send', 'player_name': <str>, 'chat_name': <str>, 'message': <str>}```
+Takes (in match):
+```{'action': 'chat_match_send', 'player_name': <str>, 'chat_name': <str>, 'message': <str>}```
+
+*message* has the form **hour: minutes, day / month - sender: <str>**
+```Example: 11:59, 10/11 - Host: Test message```
+
+Returns:
+```{'action': 'new_message', 'message': <str>}```
+
 ## Lobby endpoint
 
 ### Join lobby
@@ -86,7 +104,7 @@ Returns:
 
 To sender
 
-```{'action': 'joined_lobby', 'lobby': Lobby }```
+```{'action': 'joined_lobby', 'lobby': Lobby, 'chat': [<string>]}```
 
 To other players in the room
 
@@ -111,7 +129,7 @@ Returns:
 ### Start match
 
 Takes: 
-```{'action': 'lobby_start_match', 'player_name': str, 'lobby_name': str}```
+```{'action': 'lobby_start_match', 'player_name': str, 'lobby_name': str, 'chat': [<string>]}```
 
 Returns:
 

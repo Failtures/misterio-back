@@ -29,7 +29,7 @@ class TestLobbyEndpoints(TestCaseFastAPI):
         lobbies = res.json()['lobbies']
 
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(len(lobbies), 7)
+        self.assertEqual(len(lobbies), 8)
 
     def test_join_lobby_full(self):
         with self.client.websocket_connect('/ws') as websocket:
@@ -64,10 +64,11 @@ class TestLobbyEndpoints(TestCaseFastAPI):
                 self.assertEqual(data, {'action': 'new_player', 'player_name': 'test-player1'})
 
                 data = websocket1.receive_json()
-                self.assertEqual(data,{'action': 'joined_lobby', 'lobby': {'current_players': 2,
-                                                                        'host': 'host',
-                                                                        'name': 'test-join-lobby',
-                                                                        'players': ['host', 'test-player1']}})
+                self.assertEqual(data,{'action': 'joined_lobby', 
+                                      'lobby': {'current_players': 2, 'host': 'host',
+                                                'name': 'test-join-lobby',
+                                                'players': ['host', 'test-player1']},
+                                        'chat': []})
                     
 
     def test_start_match(self):

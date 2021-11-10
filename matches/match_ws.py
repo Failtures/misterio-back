@@ -18,6 +18,8 @@ async def match_endpoints(parsedjson, websocket):
         await suspect(parsedjson, websocket)
     elif parsedjson['action'] == 'match_question_res':
         await suspect_response(parsedjson, websocket)
+    elif parsedjson['action'] == 'match_leave':
+        await leave_match(parsedjson, websocket)
 
 
 async def end_turn(parsedjson, websocket):
@@ -218,3 +220,22 @@ async def suspect_response(parsedjson, websocket):
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
+
+async def leave_match(parsedjson, websocket):
+    try:
+        match_name = parsedjson['match_name']
+        player_name = parsedjson['player_name']
+
+        match = matchservice.get_match_by_name(match_name)
+        player = matchservice.get_player_in_match(match, player_name)
+        
+        hand = matchservice.hand_text(match.get_hand(player_name))
+        matchservice.delete_player(match, player)
+        
+        for player in match.players:
+            await player.socket.send_json({'action': 'player_left_match','player': player_name,
+                                            'hand': hand})
+        await websocket.send_json({'action': 'match_leaved'})
+    except Exception as e:
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
+        return 

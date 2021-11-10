@@ -89,7 +89,7 @@ class Match:
         return square
 
     def get_hand(self, player: str) -> List[Card]:
-        for i in range(0, len(self.players)):
+        for i in range(0, len(self.players)):       
             if self.players[i].nickname == player:
                 return self.cards[i]
         raise Exception("Player doesn't exist in match")

@@ -38,7 +38,7 @@ async def join_lobby(parsedjson, websocket):
 
         for lobbyplayer in lobby.players:
             if lobbyplayer.nickname == user.nickname:
-                await user.socket.send_json({'action': 'joined_lobby', 'lobby': lobby.to_dict()})
+                await user.socket.send_json({'action': 'joined_lobby', 'lobby': lobby.to_dict(), 'chat': list(lobby.chat)})
             else:
                 await lobbyplayer.socket.send_json({'action': 'new_player', 'player_name': player})
 
@@ -55,8 +55,8 @@ async def start_match(parsedjson, websocket):
         start_player = lobbyservice.get_player_in_lobby(lobby, player)
 
         if lobby.can_start(start_player):
-            match = matchservice.create_new_match(lobby.name, lobby.players)
-            json_msg = {'action': 'match_started', 'match': match.to_dict()}
+            match = matchservice.create_new_match(lobby.name, lobby.players, lobby.chat)
+            json_msg = {'action': 'match_started', 'match': match.to_dict(), 'chat': list(match.chat)}
         else:
             json_msg = {'action': 'failed', 'info': "Match couldn't start, "
                                                     "check if there are enough players in the lobby"

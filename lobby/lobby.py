@@ -1,4 +1,5 @@
 from users.user import User
+from collections import deque
 
 
 class Lobby:
@@ -10,6 +11,7 @@ class Lobby:
         self.name = name
         self.host = host
         self.players = [host]
+        self.chat = deque([], maxlen=100)
 
     def __eq__(self, other):
         return self.name == other.name

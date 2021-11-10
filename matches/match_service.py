@@ -1,3 +1,4 @@
+from collections import deque
 from typing import List
 from users.user import User
 from .match import Match
@@ -10,8 +11,8 @@ class MatchService:
     def __init__(self):
         self.matches = []
 
-    def create_new_match(self, name: str, players: List[User]) -> Match:
-        match = Match(name, players)
+    def create_new_match(self, name: str, players: List[User], chat:deque) -> Match:
+        match = Match(name, players, chat)
         self.matches.append(match)
 
         deck = Deck(match)

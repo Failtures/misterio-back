@@ -1,5 +1,6 @@
 import random
 
+from collections import deque
 from typing import List
 from matches.entities.card import Card
 from users.user import User
@@ -10,7 +11,7 @@ from .square import SquareType, Square
 
 class Match:
 
-    def __init__(self, name: str, players: List[User]):
+    def __init__(self, name: str, players: List[User], chat:deque = deque([], maxlen=100)):
         self._current_turn = 0
         self._rolled_dice = False
         self._moved = False
@@ -20,6 +21,9 @@ class Match:
         self.players = players
         self.board = Board([p.nickname for p in players])
         self.trapped = []
+
+        # Retrieve the chat from the lobby
+        self.chat = chat
 
         # Shuffle turn order
         random.shuffle(self.players)

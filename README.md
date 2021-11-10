@@ -13,6 +13,7 @@
     + [Join lobby](#join-lobby)
     + [Create lobby](#create-lobby)
     + [Start match](#start-match)
+    + [Leave Lobby](#leave-lobby)
   * [Match endpoint](#match-endpoint)
     + [Roll dice](#roll-dice)
     + [Get hand](#get-hand)
@@ -21,6 +22,7 @@
     + [Move](#move)
     + [Accuse](#accuse)
     + [Suspect](#suspect)
+    + [Leave Match](#leave-match)
 
 
 # Install
@@ -235,3 +237,16 @@ If the next player is not the one who made the suspect:
 
 If the next player is the one who made the suspect:
 ```{'action': 'suspect_response', 'card': <str>}```
+
+
+### Leave Match
+
+Takes:
+```{'action': 'match_leave', 'player_name': <str>, 'match_name': <str>}  ```
+
+Returns:
+  player_left:
+  ```{'action': 'match_leaved'}```
+
+  other_players:
+  ```{'action': 'player_left_match','player': <str>, 'hand': List[<str>]}}  ```

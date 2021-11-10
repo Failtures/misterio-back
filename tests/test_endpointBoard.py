@@ -35,5 +35,4 @@ class TestEndpointBoard(TestCaseFastAPI):
                 websocket.send_json({'action': 'match_move', 'match_name': 'lobby', 'pos_x': 1, 'pos_y': 6})
                 json = websocket.receive_json()
 
-                print(json)
                 self.assertEqual(json['square'], 'Regular')

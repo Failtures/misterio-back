@@ -1,6 +1,7 @@
 from fastapi import APIRouter, WebSocket
 from lobby.lobby_ws import lobby_endpoints
 from matches.match_ws import match_endpoints
+from chat.chat_ws import chat_endpoints
 
 router = APIRouter()
 
@@ -21,3 +22,5 @@ async def endpoints(websocket: WebSocket):
             await lobby_endpoints(parsedjson, websocket)
         elif parsedjson['action'].startswith('match'):
             await match_endpoints(parsedjson, websocket)
+        elif parsedjson['action'].startswith('chat'):
+            await chat_endpoints(parsedjson, websocket)

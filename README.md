@@ -84,10 +84,12 @@ Error:
 
 Takes (in lobby):
 ```{'action': 'chat_lobby_send', 'player_name': <str>, 'chat_name': <str>, 'message': <str>}```
+
 Takes (in match):
 ```{'action': 'chat_match_send', 'player_name': <str>, 'chat_name': <str>, 'message': <str>}```
 
-*message* has the form **hour: minutes, day / month - sender: <str>**
+*message* has the form **hour: minutes, day / month - sender: 'msg'**
+
 ```Example: 11:59, 10/11 - Host: Test message```
 
 Returns:

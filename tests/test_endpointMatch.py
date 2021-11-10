@@ -349,3 +349,24 @@ class TestMatchEndpoints(TestCaseFastAPI):
                     res = websocket1.receive_json()
                     
                 self.assertEqual(res, {'action': 'suspect_response', 'card': 'Dracula'})
+
+    def test_match_leave(self):
+        with self.client.websocket_connect('/ws') as websocket0:
+            websocket0.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-match-leave'})
+            websocket0.receive_json()
+            with self.client.websocket_connect('/ws') as websocket1:
+                websocket1.send_json({'action': 'lobby_join', 'player_name': 'test-player', 'lobby_name': 'test-match-leave'})
+                websocket0.receive_json()
+                websocket1.receive_json()
+
+                websocket0.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-match-leave'})
+                websocket0.receive_json()
+                websocket1.receive_json()
+
+                websocket1.send_json({'action': 'match_leave', 'player_name': 'test-player', 'match_name': 'test-match-leave'})
+                dataLeft = websocket1.receive_json()
+                dataKeep = websocket0.receive_json()
+
+                self.assertEqual({dataKeep['action'],dataKeep['player']},{'player_left_match', 'test-player'})
+                self.assertEqual(dataLeft['action'], 'match_leaved')
+                

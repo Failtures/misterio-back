@@ -2,6 +2,7 @@ from typing import List
 from users.user import User
 from .match import Match
 from .entities.deck import Deck
+from .entities.card import Card
 
 
 class MatchService:
@@ -30,3 +31,12 @@ class MatchService:
     def delete_match(self, match: Match):
         match.players = []
         self.matches.remove(match)
+
+    def delete_player(self, match: Match, player: User):
+        match.players.remove(player)
+
+    def hand_text(self, hand: List[Card]) -> List[str]:
+        textHand = []
+        for card in hand:
+            textHand.append(card.name)
+        return textHand

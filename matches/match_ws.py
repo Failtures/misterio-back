@@ -35,12 +35,16 @@ from matches.match import Match
 
 async def pass_turn(match: Match, websocket, timeout_turn):
     try:
-        if timeout_turn is not None and timeout_turn != match._current_turn:
-            print('Timed out, but player already passed turn')
-            return
-        elif timeout_turn is not None:
+        if timeout_turn is not None:
             # Always get settings dynamically
             await asyncio.sleep(getSettings().TIMEOUT)
+            # We must make sure the timer was called for the current turn,
+            # otherwise do nothing
+            if timeout_turn != match._current_turn:
+                # Timed out, but player already passed turn
+                return
+            else:
+                asyncio.get_event_loop().create_task(pass_turn(match, match.current_turn().socket, match._current_turn))
 
         match.next_turn()
 

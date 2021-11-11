@@ -1,3 +1,6 @@
+import time
+
+from config import getSettings
 from fastapi.testclient import TestClient
 from main import app
 from extensions import matchservice
@@ -381,7 +384,52 @@ class TestMatchEndpoints(TestCaseFastAPI):
                 else:
                     websocket.send_json({'action': 'match_roll_dice', 'match_name': 'test-timeout'})
                     websocket.send_json({'action': 'match_move', 'match_name': 'test-timeout', 'pos_x': 6, 'pos_y': 1})
-                    import time;time.sleep(4.0)
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+
+                    data = websocket.receive_json()
+
+                    self.assertEqual(data, {'action': 'turn_passed', 'current_turn': 'host'})
+
+    def test_pass_and_timeout(self):
+        with self.client.websocket_connect('/ws') as websocket:
+            websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-timeout2'})
+            websocket.receive_json()
+
+            websocket.send_json({'action': 'lobby_join', 'player_name': 'test-player', 'lobby_name': 'test-timeout2'})
+            # There are 2 receive per action because there is one messege per player
+            websocket.receive_json()
+            websocket.receive_json()
+
+            websocket.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-timeout2'})
+            websocket.receive_json()
+            websocket.receive_json()
+
+            for i in range(2):
+                match = matchservice.get_match_by_name('test-timeout2')
+                if match.current_turn().nickname == 'host':
+                    websocket.send_json({'action': 'match_roll_dice', 'match_name': 'test-timeout2'})
+                    websocket.send_json({'action': 'match_move', 'match_name': 'test-timeout2', 'pos_x': 1, 'pos_y': 6})
+                    # Pass turn
+                    websocket.send_json({'action': 'match_end_turn', 'match_name': 'test-timeout2'})
+                    # Wait for timeout to end
+                    time.sleep(getSettings().TIMEOUT)
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+                    websocket.receive_json()
+
+                    data = websocket.receive_json()
+
+                    self.assertEqual(data, {'action': 'turn_passed', 'current_turn': 'test-player'})
+                    # print(websocket.receive_json())
+                else:
+                    websocket.send_json({'action': 'match_roll_dice', 'match_name': 'test-timeout2'})
+                    websocket.send_json({'action': 'match_move', 'match_name': 'test-timeout2', 'pos_x': 6, 'pos_y': 1})
                     websocket.receive_json()
                     websocket.receive_json()
                     websocket.receive_json()

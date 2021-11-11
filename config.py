@@ -10,7 +10,7 @@ class Development(BaseSettings):
 
 class Test(BaseSettings):
     ENDPOINT_CORS = os.getenv('ENDPOINT_CORS') or "*"
-    TIMEOUT = 3
+    TIMEOUT = 1
 
 
 env = os.getenv('env') or 'dev'

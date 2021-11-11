@@ -1,5 +1,15 @@
+import sys
+import asyncio
+
 from extensions import matchservice, lobbyservice
 from util.vector import Vector2d
+from config import getSettings
+
+# Fixes 'ValueError: set_wakeup_fd only works in main thread' bug from asyncio,
+# Do not touch, or it will break everything for windows users
+if sys.platform == "win32" and sys.version_info >= (3, 8, 0):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 
 async def match_endpoints(parsedjson, websocket):
     if parsedjson['action'] == 'match_end_turn':
@@ -20,6 +30,28 @@ async def match_endpoints(parsedjson, websocket):
         await suspect_response(parsedjson, websocket)
 
 
+from matches.match import Match
+
+
+async def pass_turn(match: Match, websocket, timeout_turn):
+    try:
+        if timeout_turn is not None and timeout_turn != match._current_turn:
+            print('Timed out, but player already passed turn')
+            return
+        elif timeout_turn is not None:
+            # Always get settings dynamically
+            await asyncio.sleep(getSettings().TIMEOUT)
+
+        match.next_turn()
+
+        for player in match.players:
+            await player.socket.send_json({'action': 'turn_passed', 'current_turn': match.current_turn().nickname})
+
+    except Exception as e:
+        await websocket.send_json({'action': 'failed', 'info': str(e)})
+        return
+
+
 async def end_turn(parsedjson, websocket):
     try:
         match_name = parsedjson['match_name']
@@ -29,10 +61,11 @@ async def end_turn(parsedjson, websocket):
         if match.current_turn().socket.client.host != websocket.client.host:
             await websocket.send_json({'action': 'failed', 'info': "It's not your turn"})
             return
-        match.next_turn()
 
-        for player in match.players:
-            await player.socket.send_json({'action': 'turn_passed', 'current_turn': match.current_turn().nickname})
+        await pass_turn(match, match.current_turn().socket, None)
+
+        asyncio.get_event_loop().create_task(pass_turn(match, match.current_turn().socket, match._current_turn))
+
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return

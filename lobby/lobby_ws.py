@@ -1,5 +1,13 @@
+import sys
+import asyncio
+
 from extensions import lobbyservice, matchservice
 from users.network_user import NetworkUser
+
+# Fixes 'ValueError: set_wakeup_fd only works in main thread' bug from asyncio,
+# Do not touch, or it will break everything for windows users
+if sys.platform == "win32" and sys.version_info >= (3, 8, 0):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 async def lobby_endpoints(parsedjson, websocket):
@@ -57,6 +65,11 @@ async def start_match(parsedjson, websocket):
         if lobby.can_start(start_player):
             match = matchservice.create_new_match(lobby.name, lobby.players)
             json_msg = {'action': 'match_started', 'match': match.to_dict()}
+
+            from matches.match_ws import pass_turn
+
+            asyncio.get_event_loop().create_task(pass_turn(match, match.current_turn().socket, match._current_turn))
+
         else:
             json_msg = {'action': 'failed', 'info': "Match couldn't start, "
                                                     "check if there are enough players in the lobby"

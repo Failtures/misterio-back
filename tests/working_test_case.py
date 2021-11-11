@@ -2,10 +2,16 @@ import unittest
 
 
 # All tests using the FastAPI test client should extend this class
+import config
+
+
 class TestCaseFastAPI(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        from config import Test
+        config.settings = Test()
+
         # Fixes 'ValueError: set_wakeup_fd only works in main thread' bug from asyncio,
         # don't remove must be done on every test file if run separately
         import sys

@@ -55,7 +55,6 @@ class Match:
 
     def __pass_turn(self):
         self._current_turn += 1
-        self._current_turn %= len(self.players)
 
     def roll_dice(self) -> int:
         if self._rolled_dice:
@@ -65,7 +64,7 @@ class Match:
         return self._current_roll
 
     def current_turn(self) -> User:
-        return self.players[self._current_turn]
+        return self.players[self._current_turn % len(self.players)]
 
     def to_dict(self):
         return {'name': self.name, 'players': [p.nickname for p in self.players], 'turn': self.current_turn().nickname,

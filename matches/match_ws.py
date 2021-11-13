@@ -183,7 +183,7 @@ async def suspect(parsedjson, websocket):
                 player_turn = i
 
         await match.players[(player_turn + 1) % len(match.players)].socket.send_json(
-            {'action': 'question', 'monster': monster, 'victim': victim, 'room': room})
+            {'action': 'question', 'reply_to': player_name,'monster': monster, 'victim': victim, 'room': room})
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return
@@ -211,7 +211,7 @@ async def suspect_response(parsedjson, websocket):
                 victim = parsedjson['victim'].lower().title()
 
                 await match.players[(player_turn + 1) % len(match.players)].socket.send_json(
-                    {'action': 'question', 'monster': monster, 'victim': victim, 'room': room})
+                    {'action': 'question', 'reply_to': reply_to, 'monster': monster, 'victim': victim, 'room': room})
         elif parsedjson['response'] == 'affirmative':
             reply_card = parsedjson['reply_card']
 

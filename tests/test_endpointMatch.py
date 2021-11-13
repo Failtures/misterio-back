@@ -287,7 +287,7 @@ class TestMatchEndpoints(TestCaseFastAPI):
                     self.assertEqual(data1['action'], 'question')
 
                     websocket1.send_json({'action': 'match_question_res', 'response': 'negative',
-                                        'player_name': 'test-player0', 'reply_to': 'host',
+                                        'player_name': 'test-player0', 'reply_to': data1['reply_to'],
                                         'match_name': 'test-suspect-neg', 'monster': 'Dracula',
                                         'victim': 'Count', 'room': 'Living'})
 
@@ -299,7 +299,7 @@ class TestMatchEndpoints(TestCaseFastAPI):
                     data0 = websocket0.receive_json()
                     self.assertEqual(data0['action'], 'question')
                     websocket0.send_json({'action': 'match_question_res', 'response': 'negative',
-                                        'player_name': 'host', 'reply_to': 'test-player0',
+                                        'player_name': 'host', 'reply_to': data0['reply_to'],
                                         'match_name': 'test-suspect-neg', 'monster': 'Dracula',
                                         'victim': 'Count', 'room': 'Living'})
                     res = websocket1.receive_json()
@@ -333,7 +333,7 @@ class TestMatchEndpoints(TestCaseFastAPI):
                     self.assertEqual(data1['action'], 'question')
 
                     websocket1.send_json({'action': 'match_question_res', 'response': 'affirmative',
-                                        'player_name': 'test-player0', 'reply_to': 'host',
+                                        'player_name': 'test-player0', 'reply_to': data1['reply_to'],
                                         'match_name': 'test-suspect-aff', 'reply_card': 'Dracula'})
                     res = websocket0.receive_json()
                 else:
@@ -344,7 +344,7 @@ class TestMatchEndpoints(TestCaseFastAPI):
                     self.assertEqual(data0['action'], 'question')
 
                     websocket0.send_json({'action': 'match_question_res', 'response': 'affirmative',
-                                        'player_name': 'host', 'reply_to': 'test-player0',
+                                        'player_name': 'host', 'reply_to': data0['reply_to'],
                                         'match_name': 'test-suspect-aff', 'reply_card': 'Dracula'})
                     res = websocket1.receive_json()
                     

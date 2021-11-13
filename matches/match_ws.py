@@ -206,7 +206,7 @@ async def suspect_response(parsedjson, websocket):
             if match.players[(player_turn + 1) % len(match.players)] == reply_to_player:
                 await reply_to_player.socket.send_json({'action': 'suspect_response', 'card': None})
             else:
-                room = str(match.get_player_square(player_name))
+                room = parsedjson['room'].lower().title()
                 monster = parsedjson['monster'].lower().title()
                 victim = parsedjson['victim'].lower().title()
 

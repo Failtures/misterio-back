@@ -391,3 +391,31 @@ class TestMatchEndpoints(TestCaseFastAPI):
                 data = websocket0.receive_json()
 
                 self.assertEqual(data,{'action': 'match_deleted', 'info': 'no more players'})
+
+    def test_match_leave_3_players(self):
+        with self.client.websocket_connect('/ws') as websocket0:
+            websocket0.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'test-match-leave-3'})
+            websocket0.receive_json()
+            with self.client.websocket_connect('/ws') as websocket1:
+                websocket1.send_json({'action': 'lobby_join', 'player_name': 'test-player', 'lobby_name': 'test-match-leave-3'})
+                websocket0.receive_json()
+                websocket1.receive_json()
+                with self.client.websocket_connect('/ws') as websocket2:
+                    websocket2.send_json({'action': 'lobby_join', 'player_name': 'test-player2', 'lobby_name': 'test-match-leave-3'})
+                    websocket0.receive_json()
+                    websocket1.receive_json()
+                    websocket2.receive_json()
+
+                    websocket0.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'test-match-leave-3'})
+                    websocket0.receive_json()
+                    websocket1.receive_json()
+                    websocket2.receive_json()
+
+                    websocket1.send_json({'action': 'match_leave', 'player_name': 'test-player', 'match_name': 'test-match-leave-3'})
+                    dataLeft = websocket1.receive_json()
+                    dataKeep1 = websocket0.receive_json()
+                    dataKeep2 = websocket2.receive_json()
+
+                    self.assertEqual({dataKeep1['action'],dataKeep1['player']},{'player_left_match', 'test-player'})
+                    self.assertEqual(dataKeep2,{'action': 'player_left_match', 'player': 'test-player', 'hand': dataKeep1['hand']})
+                    self.assertEqual(dataLeft['action'], 'match_leaved')

@@ -147,7 +147,15 @@ async def accuse(parsedjson, websocket):
         else:
             for player in match.players:
                 await player.socket.send_json({'action': 'player_deleted', 'loser': match.current_turn().nickname})
-            match.players.remove(match.current_turn())
+            matchservice.delete_player(match, match.current_turn())
+
+            #If all players accuse incorrectly then the game is over (draw)
+            if(len(match.players) == 0):
+                for player in match.players:
+                    await player.socket.send_json({'action': 'draw_game'})
+                matchservice.delete_match(match)
+                lobby = lobbyservice.get_lobby_by_name(match_name)
+                lobbyservice.delete_lobby(lobby)
 
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
@@ -231,11 +239,19 @@ async def leave_match(parsedjson, websocket):
         
         hand = matchservice.hand_text(match.get_hand(player_name))
         matchservice.delete_player(match, player)
-        
-        for player in match.players:
-            await player.socket.send_json({'action': 'player_left_match','player': player_name,
-                                            'hand': hand})
-        await websocket.send_json({'action': 'match_leaved'})
+
+        #If every player leave the match then the match and lobby are deleted
+        if(len(match.players) == 0):
+            lobby = lobbyservice.get_lobby_by_name(match.name)
+            lobbyservice.delete_lobby(lobby)
+            matchservice.delete_match(match)
+            await websocket.send_json({'action': 'match_deleted', 'info': 'no more players'})
+        else:
+            for player in match.players:
+                await player.socket.send_json({'action': 'player_left_match','player': player_name,
+                                                'hand': hand})
+            await websocket.send_json({'action': 'match_leaved'})
+            
     except Exception as e:
         await websocket.send_json({'action': 'failed', 'info': str(e)})
         return 

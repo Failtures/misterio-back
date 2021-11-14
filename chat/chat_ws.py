@@ -13,7 +13,7 @@ async def send_msg(parsedjson, websocket, place:str):
     try:
         now = datetime.now().strftime("%H:%M, %d/%m")
         player = parsedjson['player_name']
-        msg = parsedjson['mesagge']
+        msg = parsedjson['message']
 
         message = str(now + " - " + player + ": " + msg)
 

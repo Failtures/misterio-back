@@ -1,5 +1,6 @@
 from extensions import matchservice, lobbyservice
 from util.vector import Vector2d
+from ranking.ranking_db import db_add_record
 
 async def match_endpoints(parsedjson, websocket):
     if parsedjson['action'] == 'match_end_turn':
@@ -140,6 +141,7 @@ async def accuse(parsedjson, websocket):
         if(match.mystery[0].name == monster and match.mystery[1].name == victim and match.mystery[2].name == room):
             for player in match.players:
                 await player.socket.send_json({'action': 'game_over', 'winner': match.current_turn().nickname})
+            db_add_record(match.current_turn())
             matchservice.delete_match(match)
             lobby = lobbyservice.get_lobby_by_name(match_name)
             lobbyservice.delete_lobby(lobby)

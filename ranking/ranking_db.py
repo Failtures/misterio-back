@@ -6,10 +6,11 @@ from ranking.database import Ranking
 def db_get_top_ten():
     top_ten = []
     i = 0
-    for player in Ranking.select().order_by(Ranking.victories):
+    for player in Ranking.select().order_by(desc(Ranking.victories)):
         if (i>=10):
             break
         top_ten.append({'player': player.user_name,'victories': player.victories})
+        i += 1
     return top_ten
 
 @db_session

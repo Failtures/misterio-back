@@ -1,6 +1,5 @@
 # Misterio backend
 
-### Table of contents
 - [Install](#install)
 - [Run](#run)
 - [Tests](#tests)
@@ -9,11 +8,12 @@
 - [Websockets protocol](#websockets-protocol)
   * [Definitions](#definitions)
   * [Chat endpoint](#chat-endpoint)
+    + [Send message](#send-message)
   * [Lobby endpoint](#lobby-endpoint)
     + [Join lobby](#join-lobby)
     + [Create lobby](#create-lobby)
+    + [Leave lobby](#leave-lobby)
     + [Start match](#start-match)
-    + [Leave Lobby](#leave-lobby)
   * [Match endpoint](#match-endpoint)
     + [Roll dice](#roll-dice)
     + [Get hand](#get-hand)
@@ -22,6 +22,7 @@
     + [Move](#move)
     + [Accuse](#accuse)
     + [Suspect](#suspect)
+    + [Suspect response](#suspect-response)
     + [Leave Match](#leave-match)
 
 

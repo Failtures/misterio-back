@@ -5,15 +5,18 @@ class SquareType(Enum):
     NONE = 0
     REGULAR = 1
     TRAP = 2
-    ANIMAL = 3
-    LIVING = 4
-    CELLAR = 5
-    LABORATORY = 6
-    PANTHEON = 7
-    LIBRARY = 8
-    GARAGE = 9
-    BEDROOM = 10
-    DINING = 11
+    LIVING = 3
+    CELLAR = 4
+    LABORATORY = 5
+    PANTHEON = 6
+    LIBRARY = 7
+    GARAGE = 8
+    BEDROOM = 9
+    DINING = 10
+    BAT = 11
+    COBRA = 12
+    SCORPION = 13
+    SPIDER = 14
 
 
 class Square:

@@ -9,13 +9,15 @@ router = APIRouter()
 @router.websocket('/ws')
 async def endpoints(websocket: WebSocket):
     await websocket.accept()
-    print(f'New connection from {websocket.client.host}')
+    if websocket.client.host != 'testclient':
+        print(f'New connection from {websocket.client.host}')
     # Keeps socket alive
     while True:
         try:
             parsedjson = await websocket.receive_json()
         except Exception as e:
-            print(f'{websocket.client.host} Socket crashed, reason: {e}')
+            if str(e) != '1000':
+                print(f'{websocket.client.host} Socket crashed, reason: {e}')
             break
 
         if parsedjson['action'].startswith('lobby'):

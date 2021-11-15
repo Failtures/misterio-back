@@ -146,3 +146,14 @@ class TestBoard(unittest.TestCase):
         except Exception:
             return
         self.assertTrue(False, 'Player moved more than 6 times with a roll of 6')
+
+    def test_player_can_jump_through_a_portal(self):
+        self.prepare_turn()
+        self.match._current_roll = 6
+
+        try:
+            self.match.move(Vector2d(4, 6))
+            self.match.move(Vector2d(15, 6))
+            self.assertEqual(self.match.board.get_player_position(self.match.current_turn().nickname), Vector2d(15, 6))
+        except Exception:
+            self.assertTrue(False, 'Exception raised while moving to a portal')

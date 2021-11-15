@@ -10,6 +10,11 @@ class Board:
 
     TRAPS = [(6, 6), (13, 6), (6, 13), (13, 13)]
 
+    BAT = [(6, 5), (6, 15)]
+    COBRA = [(3, 13), (14, 13)]
+    SCORPION = [(13, 5), (13, 16)]
+    SPIDER = [(15, 6), (4, 6)]
+
     ROOM_LIVING = [(3, 6), (6, 9), (4, 13)]
     ROOM_CELLAR = [(6, 4)]
     ROOM_LABORATORY = [(13, 3)]
@@ -60,6 +65,14 @@ class Board:
             room = Square(SquareType.DINING)
         elif (i, j) in self.TRAPS:
             room = Square(SquareType.TRAP)
+        elif (i, j) in self.BAT:
+            room = Square(SquareType.BAT)
+        elif (i, j) in self.COBRA:
+            room = Square(SquareType.COBRA)
+        elif (i, j) in self.SCORPION:
+            room = Square(SquareType.SCORPION)
+        elif (i, j) in self.SPIDER:
+            room = Square(SquareType.SPIDER)
         else:
             room = Square(SquareType.REGULAR)
 
@@ -71,11 +84,19 @@ class Board:
         target_square = self.squares[position.x][position.y]
         trap_to_trap = target_square.squaretype is SquareType.TRAP and \
                        self.get_player_square(player_name).squaretype is SquareType.TRAP
+        portal_to_portal = target_square.squaretype.value > 10 and\
+                           self.get_player_square(player_name).squaretype.value > 10
 
-        if required_moves > moves and not trap_to_trap:
+        if required_moves > moves and not trap_to_trap and not portal_to_portal:
             raise Exception(f'Target square is too far away moves: {moves}, moves required: {required_moves}')
         if self.squares[position.x][position.y].squaretype is SquareType.NONE:
             raise Exception('Selected square is not suitable')
+        # Make sure player doesn't move after jumping through a trap
+        if trap_to_trap:
+            required_moves = moves
+        # Player can keep on moving after jumping through a portal
+        elif portal_to_portal:
+            required_moves = 0
 
         self.player_position[player_name] = position
 

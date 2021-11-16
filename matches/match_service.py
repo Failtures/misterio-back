@@ -31,10 +31,14 @@ class MatchService:
 
     def delete_match(self, match: Match):
         match.players = []
+        match.playersOnline = []
         self.matches.remove(match)
 
     def delete_player(self, match: Match, player: User):
         match.players.remove(player)
+
+    def offline_player(self, match: Match, player: User):
+        match.playersOnline.remove(player)
 
     def hand_text(self, hand: List[Card]) -> List[str]:
         textHand = []

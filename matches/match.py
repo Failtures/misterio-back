@@ -30,9 +30,14 @@ class Match:
         
         # self.cards is an array with List[Cards]
         self.cards = []
+
+        # .self.playersOnline is a list of players who are still playing (Others can be eliminate if they lost)
+        self.playersOnline = []
+
         # For each player a tuple is created in self.cards
-        for players in self.players:
+        for player in self.players:
             self.cards.append([])
+            self.playersOnline.append(player)
 
         # self.mystery represents the envelope, will be a tuple (Card, Card, Card)
         self.mystery = None
@@ -59,7 +64,7 @@ class Match:
 
     def __pass_turn(self):
         self._current_turn += 1
-        self._current_turn %= len(self.players)
+        self._current_turn %= len(self.playersOnline)
 
     def roll_dice(self) -> int:
         if self._rolled_dice:
@@ -69,10 +74,10 @@ class Match:
         return self._current_roll
 
     def current_turn(self) -> User:
-        return self.players[self._current_turn]
+        return self.playersOnline[self._current_turn]
 
     def to_dict(self):
-        return {'name': self.name, 'players': [p.nickname for p in self.players], 'turn': self.current_turn().nickname,
+        return {'name': self.name, 'players': [p.nickname for p in self.playersOnline], 'turn': self.current_turn().nickname,
                 'player_position': self.board.positions_to_dict()}
 
     def move(self, position: Vector2d) -> Square:
@@ -93,8 +98,8 @@ class Match:
         return square
 
     def get_hand(self, player: str) -> List[Card]:
-        for i in range(0, len(self.players)):       
-            if self.players[i].nickname == player:
+        for i in range(0, len(self.playersOnline)):       
+            if self.playersOnline[i].nickname == player:
                 return self.cards[i]
         raise Exception("Player doesn't exist in match")
 

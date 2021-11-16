@@ -149,10 +149,10 @@ async def accuse(parsedjson, websocket):
         else:
             for player in match.players:
                 await player.socket.send_json({'action': 'player_deleted', 'loser': match.current_turn().nickname})
-            matchservice.delete_player(match, match.current_turn())
+            matchservice.offline_player(match, match.current_turn())
 
             #If all players accuse incorrectly then the game is over (draw)
-            if(len(match.players) == 0):
+            if(len(match.playersOnline) == 0):
                 for player in match.players:
                     await player.socket.send_json({'action': 'draw_game'})
                 matchservice.delete_match(match)

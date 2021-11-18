@@ -147,10 +147,10 @@ async def accuse(parsedjson, websocket):
             lobbyservice.delete_lobby(lobby)
 
         else:
-            for player in match.players:
-                await player.socket.send_json({'action': 'player_deleted', 'loser': match.current_turn().nickname})
             losePlayer = match.current_turn()
-            match.__pass_turn()
+            nextPlayer = match.next_turn()
+            for player in match.players:
+                await player.socket.send_json({'action': 'player_deleted', 'loser': losePlayer.nickname, 'next_turn': nextPlayer.nickname})
             matchservice.offline_player(match, losePlayer)
 
 

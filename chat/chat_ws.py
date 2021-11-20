@@ -1,5 +1,4 @@
 from extensions import lobbyservice, matchservice
-from datetime import datetime
 
 
 async def chat_endpoints(parsedjson, websocket):
@@ -11,11 +10,10 @@ async def chat_endpoints(parsedjson, websocket):
 
 async def send_msg(parsedjson, websocket, place:str):
     try:
-        now = datetime.now().strftime("%H:%M, %d/%m")
         player = parsedjson['player_name']
         msg = parsedjson['message']
 
-        message = str(now + " - " + player + ": " + msg)
+        message = str(player + ": " + msg)
 
         if place == "lobby":
             lobby = lobbyservice.get_lobby_by_name(parsedjson['chat_name'])

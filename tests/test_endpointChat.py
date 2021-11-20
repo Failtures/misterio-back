@@ -3,6 +3,7 @@ from tests.working_test_case import TestCaseFastAPI
 from extensions import lobbyservice
 from main import app
 
+
 class TestEndpointChat(TestCaseFastAPI):
 
     def setUp(self):
@@ -13,7 +14,8 @@ class TestEndpointChat(TestCaseFastAPI):
             websocket.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'send-msg-lobby'})
             websocket.receive_json()
 
-            websocket.send_json({'action': 'chat_lobby_send', 'player_name': 'host', 'chat_name': 'send-msg-lobby', 'message': "Test message"})
+            websocket.send_json({'action': 'chat_lobby_send', 'player_name': 'host',
+                                 'chat_name': 'send-msg-lobby', 'message': "Test message"})
             data = websocket.receive_json()
 
             websocket.send_json({'action': 'lobby_leave', 'player_name': 'host', 'lobby_name': 'send-msg-lobby'})
@@ -26,8 +28,9 @@ class TestEndpointChat(TestCaseFastAPI):
 
             lobby = lobbyservice.get_lobby_by_name('send-101-msgs')
 
-            for i in range(0,101):
-                websocket.send_json({'action': 'chat_lobby_send', 'player_name': 'host', 'chat_name': 'send-101-msgs', 'message': f"msg-{i}"})
+            for i in range(0, 101):
+                websocket.send_json({'action': 'chat_lobby_send', 'player_name': 'host',
+                                     'chat_name': 'send-101-msgs', 'message': f"msg-{i}"})
                 websocket.receive_json()
             
             last_msg = lobby.chat[0]
@@ -39,23 +42,27 @@ class TestEndpointChat(TestCaseFastAPI):
         with self.client.websocket_connect('/ws') as websocket0:
             websocket0.send_json({'action': 'lobby_create', 'player_name': 'host', 'lobby_name': 'send-msg-match'})
             websocket0.receive_json()
-            websocket0.send_json({'action': 'chat_lobby_send', 'player_name': 'host', 'chat_name': 'send-msg-match', 'message': "Test message"})
+            websocket0.send_json({'action': 'chat_lobby_send', 'player_name': 'host',
+                                  'chat_name': 'send-msg-match', 'message': "Test message"})
             websocket0.receive_json()
 
             with self.client.websocket_connect('/ws') as websocket1:
-                websocket1.send_json({'action': 'lobby_join', 'player_name': 'test-player', 'lobby_name': 'send-msg-match'})
+                websocket1.send_json({'action': 'lobby_join', 'player_name':
+                    'test-player', 'lobby_name': 'send-msg-match'})
                 websocket0.receive_json()
                 data = websocket1.receive_json()
                 
                 self.assertEqual(len(data['chat']), 1)
 
-                websocket0.send_json({'action': 'lobby_start_match', 'player_name': 'host', 'lobby_name': 'send-msg-match'})
+                websocket0.send_json({'action': 'lobby_start_match', 'player_name':
+                    'host', 'lobby_name': 'send-msg-match'})
                 websocket0.receive_json()
                 data = websocket1.receive_json()
 
                 self.assertEqual(len(data['chat']), 1)
 
-                websocket0.send_json({'action': 'chat_match_send', 'player_name': 'host', 'chat_name': 'send-msg-match', 'message': "match msg"})
+                websocket0.send_json({'action': 'chat_match_send', 'player_name': 'host',
+                                      'chat_name': 'send-msg-match', 'message': "match msg"})
                 websocket0.receive_json()
                 data = websocket1.receive_json()
 

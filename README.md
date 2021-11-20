@@ -96,7 +96,9 @@ Takes (in match):
 ```Example: 11:59, 10/11 - Host: Test message```
 
 Returns:
-```{'action': 'new_message', 'message': <str>}```
+```{'action': 'new_message', 'message': <str>, 'author': <str>, 'timestamp': <int>}```
+
+* _Timestamp_ is the date the message was received formated using [Unix Timestamp](https://en.wikipedia.org/wiki/Unix_time)
 
 ## Lobby endpoint
 

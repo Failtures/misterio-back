@@ -157,3 +157,17 @@ class TestBoard(unittest.TestCase):
             self.assertEqual(self.match.board.get_player_position(self.match.current_turn().nickname), Vector2d(15, 6))
         except Exception:
             self.assertTrue(False, 'Exception raised while moving to a portal')
+
+    def test_player_cant_jump_through_unmatching_portals(self):
+        self.prepare_turn()
+        self.match._current_roll = 6
+
+        try:
+            self.match.move(Vector2d(4, 6))
+            self.match.move(Vector2d(3, 13))
+            self.assertTrue(False)
+        except AssertionError:
+            self.assertTrue(False, 'Player moved through a portal of unmatching animals')
+        except Exception:
+            pass
+

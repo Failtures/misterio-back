@@ -84,8 +84,9 @@ class Board:
         target_square = self.squares[position.x][position.y]
         trap_to_trap = target_square.squaretype is SquareType.TRAP and \
                        self.get_player_square(player_name).squaretype is SquareType.TRAP
-        portal_to_portal = target_square.squaretype.value > 10 and\
-                           self.get_player_square(player_name).squaretype.value > 10
+        portal_to_portal = target_square.squaretype.value > 10 and \
+                           self.get_player_square(player_name).squaretype.value > 10 and \
+                            target_square.squaretype == self.get_player_square(player_name).squaretype
 
         if required_moves > moves and not trap_to_trap and not portal_to_portal:
             raise Exception(f'Target square is too far away moves: {moves}, moves required: {required_moves}')
